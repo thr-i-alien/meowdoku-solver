@@ -2223,10 +2223,10 @@ button:active {
   background: transparent;
   color: var(--text-muted);
   border: 1px dashed var(--border-light);
-  padding: 10px 14px;
+  padding: 12px 16px;
   border-radius: var(--radius-md);
   font-weight: 700;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -2242,6 +2242,7 @@ button:active {
 }
 
 .action-btn-ghost {
+  grid-column: 1 / -1;
   background: transparent;
   color: var(--accent-orange);
   border: none;
@@ -2366,8 +2367,13 @@ button:active {
 @media (max-width: 768px) {
   /* 應用容器邊距緊湊化，底部預留給浮動快捷欄 */
   .app-container {
-    padding: 10px 8px 92px 8px;
+    padding: 10px 8px 108px 8px;
     gap: 12px;
+  }
+
+  /* 手機介面下，推導頁面主畫面的 player-controller 隱藏，完整整合至底欄 */
+  .player-controller {
+    display: none !important;
   }
 
   /* 頂部 Header：精簡化與流動佈局 */
@@ -2605,6 +2611,28 @@ button:active {
     display: none;
   }
 
+  /* 手機介面下，手動解題頁面中 bottom bar 已有的動作按鈕（提示、清空）在頁面上不重複顯示 */
+  .play-actions-grid .action-btn-primary,
+  .play-actions-grid .action-btn-outline {
+    display: none !important;
+  }
+
+  .play-actions-grid {
+    grid-template-columns: 1fr;
+    margin-top: 4px;
+  }
+
+  .play-actions-grid .action-btn-ghost {
+    width: 100%;
+    min-height: 44px;
+    background: var(--bg-card);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-soft);
+    justify-content: center;
+    font-size: 0.88rem;
+  }
+
   /* 調色盤在手機端支援平滑水平滾動，方便單指滑動挑色 */
   .palette-toolbar {
     padding: 10px 12px;
@@ -2701,30 +2729,122 @@ button:active {
     margin: 0 2px;
   }
 
-  .mobile-bar-actions.solve-bar {
-    justify-content: center;
+  /* 手機版推導播放器整合底欄 */
+  .mobile-solve-player {
+    display: flex;
+    flex-direction: column;
     gap: 8px;
+    max-width: 520px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 2px 0;
   }
 
-  .mobile-bar-actions.solve-bar .mobile-bar-btn {
-    flex: 0 0 auto;
-    padding: 6px 14px;
-    min-height: 44px;
-    flex-direction: row;
-    gap: 6px;
+  .mobile-player-slider-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 4px;
   }
 
-  .mobile-bar-actions.solve-bar .play-btn {
+  .mobile-slider-step {
+    font-size: 0.76rem;
+    font-weight: 800;
+    color: var(--text-faint);
+    min-width: 22px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mobile-slider-step.current {
+    color: var(--accent-orange);
+  }
+
+  .mobile-player-slider {
+    flex: 1;
+    height: 5px;
+    border-radius: var(--radius-full);
+    accent-color: var(--accent-orange);
+    cursor: pointer;
+  }
+
+  .mobile-player-controls-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 0 2px;
+  }
+
+  .mobile-control-btn {
+    border: 1px solid var(--border-light);
+    background: var(--bg-subtle);
+    color: var(--text-main);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .mobile-control-btn:active:not(:disabled) {
+    transform: scale(0.92);
+  }
+
+  .mobile-control-btn:disabled {
+    opacity: 0.32;
+    cursor: not-allowed;
+  }
+
+  .mobile-control-btn.icon-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+
+  .mobile-control-btn.play-main-btn {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--accent-orange);
+    border-color: var(--accent-orange-hover);
+    color: #ffffff;
+    box-shadow: 0 3px 10px rgba(228, 117, 53, 0.38);
+  }
+
+  .mobile-control-btn.play-main-btn.playing {
+    background: #d46324;
+  }
+
+  .mobile-control-btn.speed-btn {
+    min-width: 42px;
+    height: 38px;
+    padding: 0 8px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: var(--accent-orange);
+    background: var(--accent-cream);
+    border-color: var(--accent-border);
+    border-radius: var(--radius-full);
+  }
+
+  .mobile-bar-actions.solve-empty-bar {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .solve-now-mobile-btn {
+    flex: 1;
+    max-width: 280px;
     background: var(--accent-orange);
     color: #fff;
     border-color: var(--accent-orange-hover);
-  }
-
-  .mobile-step-indicator {
-    font-size: 0.78rem;
-    font-weight: 800;
-    color: var(--text-muted);
-    padding: 0 6px;
+    gap: 8px;
+    font-size: 0.88rem;
+    flex-direction: row;
+    min-height: 44px;
   }
 
   .mobile-bar-actions.edit-bar {

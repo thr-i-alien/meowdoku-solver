@@ -30,7 +30,6 @@ interface PlayControlPanelProps {
   onApplyHint?: () => void;
   onDismissHint?: () => void;
   onClearBoardMarks: () => void;
-  onValidateBoard: () => void;
   onSwitchToSolver: () => void;
 }
 
@@ -51,7 +50,6 @@ export const PlayControlPanel: React.FC<PlayControlPanelProps> = ({
   onApplyHint,
   onDismissHint,
   onClearBoardMarks,
-  onValidateBoard,
   onSwitchToSolver,
 }) => {
   const { lang, t } = useI18n();
@@ -159,11 +157,6 @@ export const PlayControlPanel: React.FC<PlayControlPanelProps> = ({
         <button className="action-btn-primary" onClick={onRequestHint}>
           <Sparkles size={18} />
           <span>{t.playPanel.btnRequestHint}</span>
-        </button>
-
-        <button className="action-btn-secondary" onClick={onValidateBoard}>
-          <CheckCircle2 size={18} />
-          <span>{t.playPanel.btnValidateBoard}</span>
         </button>
 
         <button className="action-btn-outline" onClick={onClearBoardMarks} title={t.playPanel.btnClearBoardTitle}>

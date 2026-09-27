@@ -25,6 +25,9 @@ import {
   Pause,
   ChevronLeft,
   ChevronRight,
+  ChevronsLeft,
+  ChevronsRight,
+  Zap,
   Gamepad2,
   AlertTriangle,
 } from 'lucide-react';
@@ -313,34 +316,6 @@ export const App: React.FC = () => {
     setHintInfo(null);
   };
 
-  // 檢查目前盤面
-  const handleValidateBoard = () => {
-    const isVictorious = checkVictory(playerGrid, regionGrid, currentSolution);
-    if (isVictorious) {
-      setIsVictoryModalOpen(true);
-      setIsTimerRunning(false);
-      return;
-    }
-
-    const conflicts = checkConflicts(playerGrid, regionGrid, currentSolution, lang);
-    if (conflicts.cells.length > 0) {
-      triggerNotice(
-        t.toasts.conflictsFound(conflicts.cells.length, !!conflicts.hasSolutionConflict),
-        4500
-      );
-    } else {
-      let catCount = 0;
-      for (let r = 0; r < gridSize; r++) {
-        for (let c = 0; c < gridSize; c++) {
-          if (playerGrid[r][c] === 'CAT') catCount++;
-        }
-      }
-      triggerNotice(
-        t.toasts.validCatsPlaced(catCount, gridSize - catCount),
-        4500
-      );
-    }
-  };
 
 
   // 從截圖辨識套用網格
@@ -386,13 +361,9 @@ export const App: React.FC = () => {
   // 決定棋盤顯示的格態
   const activeStatusGrid = mode === 'SOLVE' ? solveStatusGrid : playerGrid;
 
-  // 驗證區域數量
-  const uniqueRegionsCount = new Set(regionGrid.flat()).size;
-  const isRegionCountValid = uniqueRegionsCount === gridSize;
-
   return (
     <div className="app-container">
-      {/* 頂部 Header 與三大模式切換導航 */}
+      {/* 頂部 Header 與模式切換導航 */}
       <Header
         currentMode={mode}
         onChangeMode={(newMode) => {
@@ -452,18 +423,6 @@ export const App: React.FC = () => {
                     <Sparkles size={18} color="var(--accent-orange)" /> {t.board.titleSolve}
                   </>
                 )}
-              </span>
-              <span className="card-desc">
-                {t.board.dimension} {gridSize} · {t.board.currentRegions}
-                <span
-                  style={{
-                    color: isRegionCountValid ? '#2e7d32' : '#e47535',
-                    fontWeight: 800,
-                  }}
-                >
-                  {uniqueRegionsCount} / {gridSize}
-                </span>{' '}
-                {isRegionCountValid ? t.board.validRegion : interpolate(t.board.invalidRegion, { n: gridSize })}
               </span>
             </div>
           </div>
@@ -557,7 +516,6 @@ export const App: React.FC = () => {
               onApplyHint={handleApplyHint}
               onDismissHint={() => setHintInfo(null)}
               onClearBoardMarks={handleClearBoardMarks}
-              onValidateBoard={handleValidateBoard}
               onSwitchToSolver={() => {
                 setMode('SOLVE');
                 handleRunSolver();
@@ -628,15 +586,6 @@ export const App: React.FC = () => {
 
             <button
               className="mobile-bar-btn"
-              onClick={handleValidateBoard}
-              aria-label={t.mobileBar.check}
-            >
-              <CheckCircle2 size={18} />
-              <span className="btn-text">{t.mobileBar.check}</span>
-            </button>
-
-            <button
-              className="mobile-bar-btn"
               onClick={handleClearBoardMarks}
               aria-label={t.mobileBar.clear}
               title={t.playPanel.btnClearBoardTitle}
@@ -648,47 +597,115 @@ export const App: React.FC = () => {
         )}
 
         {mode === 'SOLVE' && (
-          <div className="mobile-bar-actions solve-bar">
-            <button
-              className="mobile-bar-btn"
-              onClick={() => setCurrentStepIndex((prev) => Math.max(0, prev - 1))}
-              disabled={currentStepIndex === 0}
-              aria-label={t.mobileBar.prev}
-            >
-              <ChevronLeft size={20} />
-              <span className="btn-text">{t.mobileBar.prev}</span>
-            </button>
+          <>
+            {!solveResult?.success ? (
+              <div className="mobile-bar-actions solve-empty-bar">
+                <button
+                  className="mobile-bar-btn solve-now-mobile-btn"
+                  onClick={() => handleRunSolver()}
+                  aria-label={t.solverPanel.btnSolveNow}
+                >
+                  <Zap size={18} />
+                  <span>{t.solverPanel.btnSolveNow}</span>
+                </button>
+              </div>
+            ) : (
+              <div className="mobile-solve-player">
+                {/* 步驟時間軸滑桿 */}
+                <div className="mobile-player-slider-row">
+                  <span className="mobile-slider-step current">
+                    {String(currentStepIndex + 1).padStart(2, '0')}
+                  </span>
+                  <input
+                    type="range"
+                    min={0}
+                    max={Math.max(0, (solveResult?.steps.length || 1) - 1)}
+                    value={currentStepIndex}
+                    onChange={(e) => setCurrentStepIndex(parseInt(e.target.value, 10))}
+                    className="mobile-player-slider"
+                    aria-label={interpolate(t.mobileBar.stepIndicator, {
+                      current: currentStepIndex + 1,
+                      total: solveResult?.steps.length || 1,
+                    })}
+                  />
+                  <span className="mobile-slider-step total">
+                    {String(solveResult?.steps.length || 1).padStart(2, '0')}
+                  </span>
+                </div>
 
-            <button
-              className={`mobile-bar-btn play-btn ${isPlaying ? 'active' : ''}`}
-              onClick={() => setIsPlaying(!isPlaying)}
-              aria-label={isPlaying ? t.mobileBar.pause : t.mobileBar.play}
-            >
-              {isPlaying ? <Pause size={20} /> : <Play size={20} />}
-              <span className="btn-text">{isPlaying ? t.mobileBar.pause : t.mobileBar.play}</span>
-            </button>
+                {/* 控制器按鈕列 (整合 TimelinePlayer 功能) */}
+                <div className="mobile-player-controls-row">
+                  <button
+                    className="mobile-control-btn icon-btn"
+                    onClick={() => setCurrentStepIndex(0)}
+                    disabled={currentStepIndex === 0}
+                    title={t.solverPanel.jumpToStart}
+                    aria-label={t.solverPanel.jumpToStart}
+                  >
+                    <ChevronsLeft size={18} />
+                  </button>
 
-            <button
-              className="mobile-bar-btn"
-              onClick={() =>
-                setCurrentStepIndex((prev) =>
-                  Math.min((solveResult?.steps.length || 1) - 1, prev + 1)
-                )
-              }
-              disabled={currentStepIndex >= (solveResult?.steps.length || 1) - 1}
-              aria-label={t.mobileBar.next}
-            >
-              <ChevronRight size={20} />
-              <span className="btn-text">{t.mobileBar.next}</span>
-            </button>
+                  <button
+                    className="mobile-control-btn icon-btn"
+                    onClick={() => setCurrentStepIndex((prev) => Math.max(0, prev - 1))}
+                    disabled={currentStepIndex === 0}
+                    title={t.solverPanel.prevStep}
+                    aria-label={t.solverPanel.prevStep}
+                  >
+                    <ChevronLeft size={20} />
+                  </button>
 
-            <div className="mobile-step-indicator">
-              {interpolate(t.mobileBar.stepIndicator, {
-                current: currentStepIndex + 1,
-                total: solveResult?.steps.length || 1,
-              })}
-            </div>
-          </div>
+                  <button
+                    className={`mobile-control-btn play-main-btn ${isPlaying ? 'playing' : ''}`}
+                    onClick={() => setIsPlaying(!isPlaying)}
+                    title={isPlaying ? t.solverPanel.pause : t.solverPanel.play}
+                    aria-label={isPlaying ? t.solverPanel.pause : t.solverPanel.play}
+                  >
+                    {isPlaying ? <Pause size={22} /> : <Play size={22} style={{ marginLeft: 2 }} />}
+                  </button>
+
+                  <button
+                    className="mobile-control-btn icon-btn"
+                    onClick={() =>
+                      setCurrentStepIndex((prev) =>
+                        Math.min((solveResult?.steps.length || 1) - 1, prev + 1)
+                      )
+                    }
+                    disabled={currentStepIndex >= (solveResult?.steps.length || 1) - 1}
+                    title={t.solverPanel.nextStep}
+                    aria-label={t.solverPanel.nextStep}
+                  >
+                    <ChevronRight size={20} />
+                  </button>
+
+                  <button
+                    className="mobile-control-btn icon-btn"
+                    onClick={() =>
+                      setCurrentStepIndex((solveResult?.steps.length || 1) - 1)
+                    }
+                    disabled={currentStepIndex >= (solveResult?.steps.length || 1) - 1}
+                    title={t.solverPanel.jumpToEnd}
+                    aria-label={t.solverPanel.jumpToEnd}
+                  >
+                    <ChevronsRight size={18} />
+                  </button>
+
+                  <button
+                    className="mobile-control-btn speed-btn"
+                    onClick={() => {
+                      const speeds = [0.5, 1, 2, 4];
+                      const nextIdx = (speeds.indexOf(playbackSpeed) + 1) % speeds.length;
+                      setPlaybackSpeed(speeds[nextIdx]);
+                    }}
+                    title={`${t.solverPanel.speedTitle}: ${playbackSpeed}×`}
+                    aria-label={`${t.solverPanel.speedTitle}: ${playbackSpeed}×`}
+                  >
+                    <span>{playbackSpeed}×</span>
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
