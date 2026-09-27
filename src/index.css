@@ -842,6 +842,20 @@ button:active {
   flex-wrap: wrap;
 }
 
+.tools-upload-group .btn-secondary {
+  white-space: nowrap;
+}
+
+.tools-upload-group .btn-upload-text {
+  white-space: nowrap;
+}
+
+.tools-upload-group .btn-clear-img:hover {
+  color: #c0392b;
+  border-color: #fab1a0;
+  background: #fff5f5;
+}
+
 .tools-dimension-group {
   display: flex;
   align-items: center;
@@ -1539,6 +1553,47 @@ button:active {
   outline: 2px dotted #4361ee !important;
   outline-offset: -1px;
   box-shadow: inset 0 0 8px rgba(67, 97, 238, 0.22);
+}
+
+/* 放貓提示：格子中央半透明貓咪陰影 / 虛影預覽 */
+.cell-cat-ghost {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  z-index: 2;
+  user-select: none;
+  animation: hint-cat-ghost-float 1.8s ease-in-out infinite alternate;
+}
+
+.cell-cat-ghost svg {
+  width: 82%;
+  height: 82%;
+  max-width: 44px;
+  max-height: 44px;
+  object-fit: contain;
+  opacity: 0.38;
+  filter: drop-shadow(0 0 6px rgba(255, 183, 3, 0.75)) grayscale(15%);
+  transition: opacity 0.2s ease, filter 0.2s ease;
+}
+
+.grid-cell:hover .cell-cat-ghost svg {
+  opacity: 0.58;
+  filter: drop-shadow(0 0 10px rgba(255, 183, 3, 0.95)) brightness(1.1);
+}
+
+@keyframes hint-cat-ghost-float {
+  0% {
+    transform: scale(0.92) translateY(1px);
+    opacity: 0.85;
+  }
+  100% {
+    transform: scale(1.02) translateY(-1px);
+    opacity: 1;
+  }
 }
 
 /* 放貓指示標記：右下角旋轉星星 */
@@ -2795,19 +2850,33 @@ button:active {
 
   .tools-upload-group label,
   .tools-upload-group button {
-    flex: 1 !important;
+    flex: 1 1 0 !important;
+    min-width: 0 !important;
     height: 38px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    padding: 0 8px !important;
+    gap: 4px !important;
+    padding: 0 6px !important;
     font-size: 0.8rem !important;
+    white-space: nowrap !important;
     border-radius: var(--radius-sm) !important;
   }
 
+  .tools-upload-group .btn-upload-text {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+  }
+
   .tools-upload-group .btn-clear-img {
-    flex: 0 0 38px !important;
-    padding: 0 !important;
+    color: var(--text-main);
+  }
+
+  .tools-upload-group .btn-clear-img:active {
+    color: #c0392b !important;
+    background: #fff5f5 !important;
+    border-color: #fab1a0 !important;
   }
 
   .tools-dimension-group {

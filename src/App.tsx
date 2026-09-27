@@ -29,7 +29,7 @@ import {
   Gamepad2,
   AlertTriangle,
 } from 'lucide-react';
-import { CatIcon, CrossIcon } from './components/icons';
+import { CatIcon } from './components/icons';
 
 export const App: React.FC = () => {
   const { lang, t, interpolate } = useI18n();
@@ -61,7 +61,7 @@ export const App: React.FC = () => {
   const [playerGrid, setPlayerGrid] = useState<CellStatus[][]>(() =>
     Array.from({ length: 10 }, () => Array.from({ length: 10 }, () => 'EMPTY' as CellStatus))
   );
-  const [playTool, setPlayTool] = useState<PlayTool>('CROSS');
+  const playTool: PlayTool = 'CROSS';
   const [showConflicts, setShowConflicts] = useState<boolean>(true);
   const [autoCrossOnCat, setAutoCrossOnCat] = useState<boolean>(false);
   const [hintInfo, setHintInfo] = useState<HintInfo | null>(null);
@@ -635,30 +635,6 @@ export const App: React.FC = () => {
       <div className="mobile-bottom-bar" role="toolbar" aria-label="Mobile Navigation Toolbar">
         {mode === 'PLAY' && (
           <div className="mobile-bar-actions">
-            <button
-              className={`mobile-bar-btn ${playTool === 'CROSS' ? 'active' : ''}`}
-              onClick={() => setPlayTool('CROSS')}
-              aria-label={t.mobileBar.markCross}
-            >
-              <span className="btn-glyph" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <CrossIcon size={18} strokeWidth={4} />
-              </span>
-              <span className="btn-text">{t.mobileBar.markCross}</span>
-            </button>
-
-            <button
-              className={`mobile-bar-btn ${playTool === 'CAT' ? 'active' : ''}`}
-              onClick={() => setPlayTool('CAT')}
-              aria-label={t.mobileBar.placeCat}
-            >
-              <span className="btn-glyph" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <CatIcon size={20} />
-              </span>
-              <span className="btn-text">{t.mobileBar.placeCat}</span>
-            </button>
-
-            <div className="mobile-bar-divider" />
-
             <button
               className="mobile-bar-btn hint-btn"
               onClick={handleRequestHint}

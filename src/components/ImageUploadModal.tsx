@@ -535,7 +535,8 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
               <div className="modal-tools-bar">
                 <div className="tools-upload-group">
                   <label className="btn-secondary" style={{ cursor: 'pointer' }}>
-                    <Upload size={15} /> {t.uploadModal.btnChangeImg}
+                    <Upload size={15} style={{ flexShrink: 0 }} />
+                    <span className="btn-upload-text">{t.uploadModal.btnChangeImg}</span>
                     <input type="file" accept="image/*" onChange={handleFileUpload} style={{ display: 'none' }} />
                   </label>
 
@@ -545,10 +546,12 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                     onClick={handlePasteFromClipboard}
                     title={t.uploadModal.btnPasteToolbar}
                   >
-                    <ClipboardPaste size={15} /> {t.uploadModal.btnPasteToolbar}
+                    <ClipboardPaste size={15} style={{ flexShrink: 0 }} />
+                    <span className="btn-upload-text">{t.uploadModal.btnPasteToolbar}</span>
                   </button>
 
                   <button
+                    type="button"
                     className="btn-secondary btn-clear-img"
                     onClick={() => {
                       setImageSrc(null);
@@ -558,7 +561,8 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                     }}
                     title={t.uploadModal.btnClearImg}
                   >
-                    <X size={14} /> {t.uploadModal.btnClearImg}
+                    <X size={15} style={{ flexShrink: 0 }} />
+                    <span className="btn-upload-text">{t.uploadModal.btnClearImg}</span>
                   </button>
                 </div>
 

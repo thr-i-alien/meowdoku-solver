@@ -30,10 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
           <CatIcon size={26} />
         </div>
         <div>
-          <div className="brand-title">
-            Meowdoku
-            <span className="brand-badge">{t.brand.badge}</span>
-          </div>
+          <div className="brand-title">Meowdoku Solver</div>
           <div className="brand-subtitle">{t.brand.subtitle}</div>
         </div>
       </div>

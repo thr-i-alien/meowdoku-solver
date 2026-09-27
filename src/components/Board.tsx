@@ -518,6 +518,13 @@ export const Board: React.FC<BoardProps> = ({
                       </span>
                     )}
 
+                    {/* 智能提示：放貓半透明陰影/虛影預覽 */}
+                    {isHintCat && status !== 'CAT' && (
+                      <span className="cell-cat-ghost" aria-hidden="true">
+                        <CatIcon size="80%" />
+                      </span>
+                    )}
+
                     {/* 智能提示標記：放貓 (CAT) */}
                     {isHintCat && (
                       <span className="hint-indicator hint-indicator-cat" title={lang === 'en' ? 'Hint: Place cat' : '提示放置貓咪'}>
