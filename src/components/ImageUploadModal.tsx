@@ -457,27 +457,8 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
 
         <div className="modal-body image-upload-modal-body">
           {!imageSrc ? (
-            /* 狀態 A: 尚未載入截圖 — 專注於選取維度與匯入圖片 */
+            /* 狀態 A: 尚未載入截圖 — 專注於匯入圖片（載入後自動偵測維度並可於頂部調整） */
             <div className="upload-initial-view">
-              <div className="tools-dimension-card">
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8 }}>
-                  <span className="dimension-title">{t.uploadModal.dimensionLabel}</span>
-                  <div className="matrix-size-selector">
-                    {ALLOWED_GRID_SIZES.map((sz) => (
-                      <button
-                        key={sz}
-                        type="button"
-                        className={`size-btn ${gridSize === sz ? 'active' : ''}`}
-                        onClick={() => setGridSize(sz)}
-                        title={`${sz}×${sz}`}
-                      >
-                        {sz}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-
               <div
                 className="cropper-container cropper-empty-dropzone"
                 onDragOver={(e) => {
@@ -936,13 +917,15 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
           <button className="btn-secondary" onClick={onClose}>
             {t.uploadModal.btnCancel}
           </button>
-          <button
-            className="btn-primary btn-apply-board"
-            onClick={handleApply}
-            disabled={!recognizedGrid || !imageSrc}
-          >
-            <Check size={16} /> {t.uploadModal.btnApply}
-          </button>
+          {imageSrc && (
+            <button
+              className="btn-primary btn-apply-board"
+              onClick={handleApply}
+              disabled={!recognizedGrid}
+            >
+              <Check size={16} /> {t.uploadModal.btnApply}
+            </button>
+          )}
         </div>
       </div>
     </div>

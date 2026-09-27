@@ -2987,6 +2987,10 @@ button:active {
     font-size: 0.85rem !important;
   }
 
+  .image-upload-modal-content .modal-footer .btn-secondary:only-child {
+    flex: 1 !important;
+  }
+
   .image-upload-modal-content .modal-footer .btn-apply-board {
     width: auto !important;
     flex: 1 !important;
