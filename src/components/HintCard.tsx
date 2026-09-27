@@ -1,13 +1,15 @@
 import React from 'react';
-import type { HintInfo } from '../types/game';
+import type { HintInfo, RegionColor } from '../types/game';
 import { useI18n } from '../i18n';
 import { Sparkles, XCircle, Check, X } from 'lucide-react';
+import { ColoredText } from './ColoredText';
 
 export interface HintCardProps {
   hintInfo: HintInfo;
   onApplyHint?: () => void;
   onClose?: () => void;
   className?: string;
+  colors?: RegionColor[];
 }
 
 /**
@@ -19,6 +21,7 @@ export const HintCard: React.FC<HintCardProps> = ({
   onApplyHint,
   onClose,
   className = '',
+  colors,
 }) => {
   const { lang, t } = useI18n();
 
@@ -46,7 +49,7 @@ export const HintCard: React.FC<HintCardProps> = ({
             <XCircle size={18} color="#ef476f" className="hint-icon" />
           )}
           <span className={`hint-tag ${isCat ? 'hint-tag-cat' : 'hint-tag-cross'}`}>
-            {displayReason}
+            <ColoredText text={displayReason} colors={colors} />
           </span>
           <span className={`hint-type-badge ${isCat ? 'badge-cat' : 'badge-cross'}`}>
             {isCat
@@ -67,7 +70,9 @@ export const HintCard: React.FC<HintCardProps> = ({
         )}
       </div>
 
-      <div className="hint-body">{displayMessage}</div>
+      <div className="hint-body">
+        <ColoredText text={displayMessage} colors={colors} />
+      </div>
 
       <div className="hint-target">
         {isMulti ? (

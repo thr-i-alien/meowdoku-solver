@@ -14,7 +14,7 @@
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square" alt="PRs Welcome" />
 </p>
 
-**Meowdoku Solver** 是一款專為「貓咪數獨 / Star Battle（雙星不相鄰）/ Queens 拼圖」設計的現代化益智解謎與智能推導應用程式。
+**Meowdoku Solver** 是一款專為「Meowdoku / 貓咪數獨」設計的現代化益智解謎與智能推導應用程式。
 
 結合了**純邏輯推導引擎**、**步驟白話解說**、**截圖色彩自動辨識**、**智慧錦囊**與**極致流暢的手機/電腦雙端手感**。無論是想親自動腦挑戰解謎，還是想一窺背後嚴謹的消去法推導步驟，都能輕鬆上手！
 

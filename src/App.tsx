@@ -488,6 +488,7 @@ export const App: React.FC = () => {
             <div className="board-inline-hint-wrapper">
               <HintCard
                 hintInfo={hintInfo}
+                colors={activeColors}
                 onApplyHint={handleApplyHint}
                 onClose={() => setHintInfo(null)}
               />
@@ -508,6 +509,7 @@ export const App: React.FC = () => {
               autoCrossOnCat={autoCrossOnCat}
               hintInfo={hintInfo}
               hasConflicts={conflicts.cells.length > 0}
+              colors={activeColors}
               onToggleTimer={() => setIsTimerRunning(!isTimerRunning)}
               onResetTimer={() => setElapsedSeconds(0)}
               onToggleShowConflicts={() => setShowConflicts(!showConflicts)}
@@ -553,6 +555,7 @@ export const App: React.FC = () => {
                 totalCatsTarget={gridSize}
                 isPureLogic={solveResult?.isPureLogic ?? true}
                 hasMultipleSolutions={solveResult?.hasMultipleSolutions}
+                colors={activeColors}
               />
 
               {solveResult?.hasMultipleSolutions && (

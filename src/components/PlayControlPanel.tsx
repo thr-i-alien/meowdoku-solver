@@ -1,5 +1,5 @@
 import React from 'react';
-import type { HintInfo } from '../types/game';
+import type { HintInfo, RegionColor } from '../types/game';
 import { CatIcon } from './icons';
 import { useI18n } from '../i18n';
 import { HintCard } from './HintCard';
@@ -22,6 +22,7 @@ interface PlayControlPanelProps {
   autoCrossOnCat: boolean;
   hintInfo: HintInfo | null;
   hasConflicts: boolean;
+  colors?: RegionColor[];
   onToggleTimer: () => void;
   onResetTimer: () => void;
   onToggleShowConflicts: () => void;
@@ -42,6 +43,7 @@ export const PlayControlPanel: React.FC<PlayControlPanelProps> = ({
   autoCrossOnCat,
   hintInfo,
   hasConflicts,
+  colors,
   onToggleTimer,
   onResetTimer,
   onToggleShowConflicts,
@@ -146,6 +148,7 @@ export const PlayControlPanel: React.FC<PlayControlPanelProps> = ({
         <div className="play-panel-hint-wrapper">
           <HintCard
             hintInfo={hintInfo}
+            colors={colors}
             onApplyHint={onApplyHint}
             onClose={onDismissHint}
           />

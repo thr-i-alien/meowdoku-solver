@@ -3198,3 +3198,27 @@ button:active {
     font-size: 0.65rem;
   }
 }
+
+/* 提示與推導步驟中出現之顏色文字底色標籤 */
+.color-pill-tag {
+  display: inline-block;
+  padding: 1px 7px;
+  margin: 0 3px;
+  border-radius: 5px;
+  font-weight: 800;
+  font-size: 0.9em;
+  line-height: 1.35;
+  vertical-align: baseline;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.1);
+  transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.15s ease;
+  user-select: text;
+}
+
+.color-pill-tag:hover {
+  transform: translateY(-1px) scale(1.04);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.22);
+}
+

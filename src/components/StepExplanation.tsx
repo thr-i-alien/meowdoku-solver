@@ -1,7 +1,8 @@
 import React from 'react';
-import type { DeductionStep } from '../types/game';
+import type { DeductionStep, RegionColor } from '../types/game';
 import { CheckCircle2, Sparkles, AlertCircle, Compass, Layers } from 'lucide-react';
 import { useI18n } from '../i18n';
+import { ColoredText } from './ColoredText';
 
 interface StepExplanationProps {
   currentStep?: DeductionStep;
@@ -10,6 +11,7 @@ interface StepExplanationProps {
   totalCatsTarget: number;
   isPureLogic: boolean;
   hasMultipleSolutions?: boolean;
+  colors?: RegionColor[];
 }
 
 export const StepExplanation: React.FC<StepExplanationProps> = ({
@@ -19,6 +21,7 @@ export const StepExplanation: React.FC<StepExplanationProps> = ({
   totalCatsTarget,
   isPureLogic,
   hasMultipleSolutions,
+  colors,
 }) => {
   const { lang, t, interpolate } = useI18n();
 
@@ -74,10 +77,12 @@ export const StepExplanation: React.FC<StepExplanationProps> = ({
         </span>
       </div>
 
-      <h3 className="step-title">{displayTitle}</h3>
+      <h3 className="step-title">
+        <ColoredText text={displayTitle} colors={colors} />
+      </h3>
 
       <div className="step-body">
-        {displayExplanation}
+        <ColoredText text={displayExplanation} colors={colors} />
       </div>
 
       <div className="step-stats-bar">
