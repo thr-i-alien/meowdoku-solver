@@ -676,11 +676,47 @@ button:active {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px 12px;
   padding-top: 8px;
   border-top: 1px solid var(--border-light);
   font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-muted);
+}
+
+/* 多解提示卡片 */
+.multiple-solutions-alert-card {
+  background: linear-gradient(135deg, #fffaf3 0%, #fff3e2 100%);
+  border-radius: var(--radius-lg);
+  padding: 18px 20px;
+  border: 1.5px solid #f6cca0;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.multiple-solutions-alert-header {
+  font-weight: 800;
+  font-size: 0.95rem;
+  color: #bf5314;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.multiple-solutions-alert-header .alert-icon {
+  color: var(--accent-orange);
+  flex-shrink: 0;
+}
+
+.multiple-solutions-alert-desc {
+  font-size: 0.85rem;
+  color: #7b4c2b;
+  line-height: 1.6;
+  margin: 0;
 }
 
 /* 播放器控制列 */
@@ -2562,6 +2598,11 @@ button:active {
 
   .pill-neutral {
     color: var(--text-muted);
+  }
+
+  /* 手機介面下已有頂部 status pill 顯示貓咪放置數量，隱藏重複的進度卡片 */
+  .progress-card {
+    display: none;
   }
 
   /* 調色盤在手機端支援平滑水平滾動，方便單指滑動挑色 */

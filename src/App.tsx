@@ -16,7 +16,6 @@ import { ExportTextModal } from './components/ExportTextModal';
 import { useI18n } from './i18n';
 import {
   AlertCircle,
-  CheckCircle,
   Info,
   Timer,
   RotateCcw,
@@ -595,37 +594,20 @@ export const App: React.FC = () => {
                 currentStepIndex={currentStepIndex}
                 totalCatsTarget={gridSize}
                 isPureLogic={solveResult?.isPureLogic ?? true}
+                hasMultipleSolutions={solveResult?.hasMultipleSolutions}
               />
 
-              <div
-                style={{
-                  background: 'var(--bg-card)',
-                  borderRadius: 'var(--radius-lg)',
-                  padding: '18px 20px',
-                  border: '1px solid var(--border-light)',
-                  boxShadow: 'var(--shadow-soft)',
-                  fontSize: '0.85rem',
-                  color: 'var(--text-muted)',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: 8,
-                }}
-              >
-                <div
-                  style={{
-                    fontWeight: 800,
-                    color: 'var(--text-main)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 6,
-                  }}
-                >
-                  <CheckCircle size={16} color="var(--accent-orange)" /> {t.solverPanel.systemGuaranteeTitle}
+              {solveResult?.hasMultipleSolutions && (
+                <div className="multiple-solutions-alert-card" role="status">
+                  <div className="multiple-solutions-alert-header">
+                    <AlertTriangle size={18} className="alert-icon" />
+                    <span>{t.solverPanel.multipleSolutionsTitle}</span>
+                  </div>
+                  <p className="multiple-solutions-alert-desc">
+                    {t.solverPanel.multipleSolutionsDesc}
+                  </p>
                 </div>
-                <p>
-                  {t.solverPanel.systemGuaranteeDesc}
-                </p>
-              </div>
+              )}
             </>
           )}
         </div>

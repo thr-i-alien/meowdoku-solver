@@ -110,8 +110,13 @@ export interface Translations {
     logicQuality: string;
     pureLogic: string;
     heuristicLogic: string;
-    systemGuaranteeTitle: string;
-    systemGuaranteeDesc: string;
+    systemGuaranteeTitle?: string;
+    systemGuaranteeDesc?: string;
+    multipleSolutionsTitle: string;
+    multipleSolutionsDesc: string;
+    solutionUniqueness: string;
+    singleSolution: string;
+    multipleSolutions: string;
 
     rules: {
       INITIAL: string;

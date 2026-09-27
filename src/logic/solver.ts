@@ -840,14 +840,22 @@ export function solveMeowdoku(regionGrid: number[][], colors: RegionColor[] = DE
     }
   }
 
+  const solutionCount = countSolutions(regionGrid, 2);
+  const hasMultipleSolutions = solutionCount >= 2;
+
   if (catsPlacedCount === N) {
+    const isMulti = hasMultipleSolutions;
     steps.push({
       stepNumber: ++stepCount,
       ruleType: 'COMPLETED',
-      title: '解題成功！',
-      titleEn: 'Puzzle Solved!',
-      explanation: `全部 ${N} 隻貓咪皆已安置完畢！每橫列、直欄與彩色區域均恰好有一隻貓，且任兩隻貓周圍八格互不接觸！`,
-      explanationEn: `All ${N} cats placed successfully! Each row, column, and color region contains exactly 1 cat, and no two cats touch within 8 adjacent cells!`,
+      title: isMulti ? '解題成功（此題存在多種解）' : '解題成功！',
+      titleEn: isMulti ? 'Puzzle Solved (Multiple Solutions Exist)' : 'Puzzle Solved!',
+      explanation: isMulti
+        ? `全部 ${N} 隻貓咪皆已安置完畢！此盤面檢驗出存在多種合法解答，展示為其中一種可行推導。每橫列、直欄與彩色區域均恰好有一隻貓，且任兩隻貓周圍八格互不接觸！`
+        : `全部 ${N} 隻貓咪皆已安置完畢！每橫列、直欄與彩色區域均恰好有一隻貓，且任兩隻貓周圍八格互不接觸！`,
+      explanationEn: isMulti
+        ? `All ${N} cats placed successfully! Note that multiple valid solutions exist for this board; this deduction represents one feasible path. Each row, column, and color region contains exactly 1 cat, and no two cats touch within 8 adjacent cells!`
+        : `All ${N} cats placed successfully! Each row, column, and color region contains exactly 1 cat, and no two cats touch within 8 adjacent cells!`,
       boardSnapshot: cloneGrid(statusGrid),
       catsCount: N,
     });
@@ -856,6 +864,8 @@ export function solveMeowdoku(regionGrid: number[][], colors: RegionColor[] = DE
       isPureLogic,
       steps,
       solutionGrid: statusGrid,
+      hasMultipleSolutions,
+      solutionCount,
     };
   }
 
@@ -864,6 +874,8 @@ export function solveMeowdoku(regionGrid: number[][], colors: RegionColor[] = DE
     isPureLogic: false,
     steps,
     errorMessage: '推導停滯：此盤面在給定規則下無解，請確認區域顏色與連通劃分是否正確。',
+    hasMultipleSolutions: false,
+    solutionCount,
   };
 }
 
@@ -911,3 +923,73 @@ function solveFromCurrent(regionGrid: number[][], currentGrid: CellStatus[][], t
 
   return dfs(0);
 }
+
+/**
+ * 高速 DFS 計算盤面的有效解數量（上限為 maxSolutions，預設為 2）
+ * 規則：
+ * 1. 棋盤維度 N×N，恰有 N 個不同區域
+ * 2. 每列恰好 1 隻貓咪
+ * 3. 每個直欄恰好 1 隻貓咪
+ * 4. 每個彩色區域恰好 1 隻貓咪
+ * 5. 任兩隻貓咪周圍 8 格互不相鄰（含對角線；等價於相鄰列貓咪的直欄距離 > 1）
+ */
+export function countSolutions(
+  regionGrid: number[][],
+  maxSolutions: number = 2
+): number {
+  const N = regionGrid.length;
+  if (N === 0 || regionGrid[0].length !== N) return 0;
+
+  const uniqueRegions = Array.from(new Set(regionGrid.flat()));
+  if (uniqueRegions.length !== N) return 0;
+
+  // 映射區域編號至 0 ~ N-1
+  const regionMap = new Map<number, number>();
+  uniqueRegions.forEach((reg, idx) => regionMap.set(reg, idx));
+  const normalizedGrid = regionGrid.map((row) => row.map((reg) => regionMap.get(reg)!));
+
+  const colUsed = new Array(N).fill(false);
+  const regionUsed = new Array(N).fill(false);
+  const rowCol = new Array(N).fill(-1);
+
+  let solutionCount = 0;
+  let nodeCount = 0;
+  const maxNodes = 50000;
+
+  function search(row: number): void {
+    if (solutionCount >= maxSolutions || nodeCount >= maxNodes) return;
+    nodeCount++;
+
+    if (row === N) {
+      solutionCount++;
+      return;
+    }
+
+    const prevCol = row > 0 ? rowCol[row - 1] : -999;
+
+    for (let c = 0; c < N; c++) {
+      if (colUsed[c]) continue;
+      // 8 方向相鄰排除
+      if (Math.abs(c - prevCol) <= 1) continue;
+
+      const reg = normalizedGrid[row][c];
+      if (regionUsed[reg]) continue;
+
+      colUsed[c] = true;
+      regionUsed[reg] = true;
+      rowCol[row] = c;
+
+      search(row + 1);
+
+      colUsed[c] = false;
+      regionUsed[reg] = false;
+      rowCol[row] = -1;
+
+      if (solutionCount >= maxSolutions || nodeCount >= maxNodes) return;
+    }
+  }
+
+  search(0);
+  return solutionCount;
+}
+

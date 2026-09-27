@@ -125,8 +125,11 @@ export const en: Translations = {
     logicQuality: 'Deduction Quality: ',
     pureLogic: '100% Pure Elimination',
     heuristicLogic: 'With Hypothesis Verification',
-    systemGuaranteeTitle: 'System Deduction Guarantee',
-    systemGuaranteeDesc: 'Strict elimination order: [Region Single] ➔ [Row/Col Single] ➔ [Region/Line Pointing] ➔ [King\'s Move Neighborhood]. Each step can be traversed back and forth using the timeline.',
+    multipleSolutionsTitle: 'Multiple Solutions Detected',
+    multipleSolutionsDesc: 'This board layout has 2 or more valid placements (non-unique). The deduction sequence demonstrates one feasible logical path.',
+    solutionUniqueness: 'Solution Uniqueness: ',
+    singleSolution: 'Unique Solution',
+    multipleSolutions: 'Multiple Solutions',
 
     rules: {
       INITIAL: 'Initialize Board',

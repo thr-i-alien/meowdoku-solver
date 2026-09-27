@@ -51,6 +51,8 @@ export interface SolveResult {
   steps: DeductionStep[];
   solutionGrid?: CellStatus[][];
   errorMessage?: string;
+  hasMultipleSolutions?: boolean;
+  solutionCount?: number;
 }
 
 export type AppMode = 'PLAY' | 'SOLVE';

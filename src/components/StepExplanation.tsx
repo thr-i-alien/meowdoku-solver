@@ -9,6 +9,7 @@ interface StepExplanationProps {
   currentStepIndex: number;
   totalCatsTarget: number;
   isPureLogic: boolean;
+  hasMultipleSolutions?: boolean;
 }
 
 export const StepExplanation: React.FC<StepExplanationProps> = ({
@@ -17,6 +18,7 @@ export const StepExplanation: React.FC<StepExplanationProps> = ({
   currentStepIndex,
   totalCatsTarget,
   isPureLogic,
+  hasMultipleSolutions,
 }) => {
   const { lang, t, interpolate } = useI18n();
 
@@ -92,6 +94,14 @@ export const StepExplanation: React.FC<StepExplanationProps> = ({
             {isPureLogic ? t.solverPanel.pureLogic : t.solverPanel.heuristicLogic}
           </span>
         </div>
+        {hasMultipleSolutions !== undefined && (
+          <div>
+            {t.solverPanel.solutionUniqueness}{' '}
+            <span style={{ color: hasMultipleSolutions ? '#d97724' : '#2e7d32', fontWeight: 800 }}>
+              {hasMultipleSolutions ? t.solverPanel.multipleSolutions : t.solverPanel.singleSolution}
+            </span>
+          </div>
+        )}
       </div>
     </div>
   );

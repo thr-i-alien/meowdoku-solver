@@ -125,8 +125,11 @@ export const zhTW: Translations = {
     logicQuality: '推理品質：',
     pureLogic: '100% 純消去邏輯',
     heuristicLogic: '含分支假說驗證',
-    systemGuaranteeTitle: '系統推導保證',
-    systemGuaranteeDesc: '本系統嚴格執行消去推理順序：【區域唯一】優先 ➔ 【行列殘格】 ➔ 【區塊鎖定/交叉排除】 ➔ 【八方位死鎖排他】。每一步驟皆可透過上方時間軸回溯或前進，盤面上會以呼吸光暈高亮對應的列、欄、區域與新排除格子。',
+    multipleSolutionsTitle: '檢測到盤面存在多種解',
+    multipleSolutionsDesc: '此盤面配置經檢驗存在 2 種以上的合法解答（非唯一解）。當前推導步驟為其中一種可行之邏輯路徑。',
+    solutionUniqueness: '解答唯一性：',
+    singleSolution: '唯一確定解',
+    multipleSolutions: '存在多種解',
 
     rules: {
       INITIAL: '初始化盤面',
