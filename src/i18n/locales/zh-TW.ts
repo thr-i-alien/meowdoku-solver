@@ -3,9 +3,9 @@ import type { Translations } from '../types';
 export const zhTW: Translations = {
   brand: {
     badge: '挑戰與推導',
-    subtitle: '貓咪數獨 · 手動解題與人類邏輯推導器',
-    modeSolve: 'AI 推導',
-    modeSolveTitle: '觀看逐步 AI 人類邏輯推導步驟',
+    subtitle: '貓咪數獨 · 手動解題與逐步邏輯求解器',
+    modeSolve: '邏輯推導',
+    modeSolveTitle: '觀看逐步邏輯推導步驟',
     modePlay: '手動解題',
     modePlayTitle: '親自動手挑戰解題',
     modeEdit: '地圖編輯',
@@ -22,7 +22,7 @@ export const zhTW: Translations = {
   board: {
     titlePlay: '手動挑戰解題',
     titleEdit: '盤面顏色繪製',
-    titleSolve: 'AI 邏輯推導步驟',
+    titleSolve: '逐步邏輯推導步驟',
     dimension: '維度',
     currentRegions: '當前區域數：',
     validRegion: '(合格)',
@@ -50,7 +50,7 @@ export const zhTW: Translations = {
     guideRuleTitle: '規則提醒：',
     guideRuleDesc: '{n}×{n} 盤面必須恰好劃分為 {n} 個不同顏色的連續區塊，每種顏色區域最終都必須放一隻貓咪。',
     btnStartPlay: '開始手動挑戰 ➔',
-    btnStartSolve: 'AI 邏輯推導解答 ➔',
+    btnStartSolve: '逐步邏輯推導解答 ➔',
     toolBrush: '筆刷塗色',
     toolBucket: '油漆桶填色',
     gridSizeLabel: '盤面維度',
@@ -126,7 +126,7 @@ export const zhTW: Translations = {
     btnValidateBoard: '檢查盤面',
     btnClearBoard: '清空標記',
     btnClearBoardTitle: '清空盤面上的貓咪與標記',
-    btnSwitchSolver: '觀看 AI 推導解答 ➔',
+    btnSwitchSolver: '觀看逐步邏輯推導解答 ➔',
   },
 
   solverPanel: {
@@ -225,7 +225,7 @@ export const zhTW: Translations = {
     timeLabel: '解題用時',
     successConfigLabel: '成功配置',
     btnPlayAgain: '再挑戰一局',
-    btnViewAI: '觀看 AI 邏輯步驟',
+    btnViewAI: '觀看邏輯推導步驟',
     timeFormat: (mins, secs) => `${mins} 分 ${secs} 秒`,
   },
 
@@ -288,7 +288,7 @@ export const zhTW: Translations = {
     feature1Title: '🐾 遊戲進度智慧還原',
     feature1Desc: '自動辨識截圖中已放置的貓咪與 ✕ 標記，直接套用至遊玩棋盤接關挑戰，不必重頭開始！',
     feature2Title: '🖌️ 自訂地圖編輯器',
-    feature2Desc: '支援單格筆刷塗色、油漆桶快速填色、4~12 維度自由擴展，並可一鍵隨機生成合法地圖挑戰或交由 AI 推導！',
+    feature2Desc: '支援單格筆刷塗色、油漆桶快速填色、4~12 維度自由擴展，並可一鍵隨機生成合法地圖挑戰或交由系統進行邏輯推導！',
     feature3Title: '📸 全尺寸截圖智慧適配',
     feature3Desc: '升級全新電腦視覺演算法，精準適配 4~12 各維度棋盤與局部裁切截圖，自動貼合色塊真實邊緣。',
     feature4Title: '🎨 預覽微調與純白標記',
@@ -305,7 +305,7 @@ export const zhTW: Translations = {
     batchCrossConflict: (r, c) =>
       `劃記 ✕ 與正解衝突：第 ${r} 列、第 ${c} 欄為貓咪位置，不可劃記 ✕！`,
     noHintFound:
-      '目前未找到顯著的推導提示，你可以嘗試換個區域思考，或點擊「AI 推導」觀看完整解答！',
+      '目前未找到顯著的推導提示，你可以嘗試換個區域思考，或點擊「邏輯推導」觀看完整解答！',
     boardVictory: '恭喜通關！',
     conflictsFound: (count, hasSolution) =>
       hasSolution

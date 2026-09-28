@@ -3,9 +3,9 @@ import type { Translations } from '../types';
 export const en: Translations = {
   brand: {
     badge: 'Solver & Play',
-    subtitle: 'Cat Sudoku · Manual Play & Human Deduction Solver',
-    modeSolve: 'AI Solver',
-    modeSolveTitle: 'Watch step-by-step human logic deduction',
+    subtitle: 'Cat Sudoku · Manual Play & Step-by-Step Logic Solver',
+    modeSolve: 'Logic Solver',
+    modeSolveTitle: 'Watch step-by-step logic deduction',
     modePlay: 'Play Mode',
     modePlayTitle: 'Challenge the puzzle manually',
     modeEdit: 'Map Editor',
@@ -22,7 +22,7 @@ export const en: Translations = {
   board: {
     titlePlay: 'Manual Puzzle Challenge',
     titleEdit: 'Board Color Painting',
-    titleSolve: 'AI Logical Deduction Steps',
+    titleSolve: 'Step-by-Step Logic Deduction',
     dimension: 'Dimension',
     currentRegions: 'Current Regions: ',
     validRegion: '(Valid)',
@@ -50,7 +50,7 @@ export const en: Translations = {
     guideRuleTitle: 'Rule Reminder:',
     guideRuleDesc: 'A {n}×{n} matrix must consist of exactly {n} continuous colored regions. Each region will hold 1 cat.',
     btnStartPlay: 'Start Manual Challenge ➔',
-    btnStartSolve: 'AI Logic Deduction ➔',
+    btnStartSolve: 'Step-by-Step Logic Deduction ➔',
     toolBrush: 'Brush',
     toolBucket: 'Bucket Fill',
     gridSizeLabel: 'Grid Dimension',
@@ -126,7 +126,7 @@ export const en: Translations = {
     btnValidateBoard: 'Check Board',
     btnClearBoard: 'Clear Marks',
     btnClearBoardTitle: 'Clear all cats and marks on board',
-    btnSwitchSolver: 'View AI Deduction Steps ➔',
+    btnSwitchSolver: 'View Logic Deduction Steps ➔',
   },
 
   solverPanel: {
@@ -225,7 +225,7 @@ export const en: Translations = {
     timeLabel: 'Time Elapsed',
     successConfigLabel: 'Placed Cats',
     btnPlayAgain: 'Play Again',
-    btnViewAI: 'View AI Logic Steps',
+    btnViewAI: 'View Logic Steps',
     timeFormat: (mins, secs) => `${mins}m ${secs}s`,
   },
 
@@ -305,7 +305,7 @@ export const en: Translations = {
     batchCrossConflict: (r, c) =>
       `Conflict with solution: Row ${r}, Col ${c} contains a cat, cannot mark ✕!`,
     noHintFound:
-      'No obvious deduction hint found right now. Try examining other regions or click "AI Solver" to view the full solution!',
+      'No obvious deduction hint found right now. Try examining other regions or click "Logic Solver" to view the full solution!',
     boardVictory: 'Victory! Puzzle completed!',
     conflictsFound: (count, hasSolution) =>
       hasSolution
