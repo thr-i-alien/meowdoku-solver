@@ -23,6 +23,7 @@ import { VictoryModal } from './components/VictoryModal';
 import { ImageUploadModal } from './components/ImageUploadModal';
 import { HelpModal } from './components/HelpModal';
 import { ExportTextModal } from './components/ExportTextModal';
+import { AnnouncementModal, ANNOUNCEMENT_STORAGE_KEY } from './components/AnnouncementModal';
 import { useI18n } from './i18n';
 import {
   AlertCircle,
@@ -123,7 +124,20 @@ export const App: React.FC = () => {
   const [isUploadModalOpen, setIsUploadModalOpen] = useState<boolean>(false);
   const [isHelpModalOpen, setIsHelpModalOpen] = useState<boolean>(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState<boolean>(false);
+  const [isAnnouncementOpen, setIsAnnouncementOpen] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  // 檢查是否已閱讀過本次功能重大更新公告
+  useEffect(() => {
+    try {
+      const hasSeen = localStorage.getItem(ANNOUNCEMENT_STORAGE_KEY);
+      if (!hasSeen) {
+        setIsAnnouncementOpen(true);
+      }
+    } catch {
+      // 避免無痕模式下 localStorage 存取異常
+    }
+  }, []);
 
   // 計時器
   const solveTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -455,27 +469,40 @@ export const App: React.FC = () => {
 
 
 
-  // 從截圖辨識套用網格
-  const handleApplyRecognizedGrid = (grid: number[][], size: number, detectedColors?: RegionColor[]) => {
+  // 從截圖辨識套用網格與進行中進度
+  const handleApplyRecognizedGrid = (
+    grid: number[][],
+    size: number,
+    detectedColors?: RegionColor[],
+    cellStatuses?: CellStatus[][]
+  ) => {
     setGridSize(size);
     setRegionGrid(grid);
-    setPlayerGrid(
-      Array.from({ length: size }, () =>
-        Array.from({ length: size }, () => 'EMPTY' as CellStatus)
-      )
-    );
+
+    // 若有辨識出的進度（貓咪與 ✕），直接套入玩家棋盤
+    if (cellStatuses && cellStatuses.length === size) {
+      setPlayerGrid(cellStatuses.map((row) => [...row]));
+    } else {
+      setPlayerGrid(
+        Array.from({ length: size }, () =>
+          Array.from({ length: size }, () => 'EMPTY' as CellStatus)
+        )
+      );
+    }
+
     setElapsedSeconds(0);
     setIsTimerRunning(true);
     setHintInfo(null);
 
-    const colorsToUse = detectedColors && detectedColors.length >= size ? detectedColors : DEFAULT_COLORS.slice(0, size);
+    const colorsToUse =
+      detectedColors && detectedColors.length >= size
+        ? detectedColors
+        : DEFAULT_COLORS.slice(0, size);
     setActiveColors(colorsToUse);
 
-    if (mode === 'SOLVE') {
-      handleRunSolver(grid, colorsToUse);
-    } else {
-      setMode('PLAY');
-    }
+    // 依約定進入 PLAY 手動挑戰模式，並背景求解以供提示與衝突即時比對
+    setMode('PLAY');
+    handleRunSolver(grid, colorsToUse);
   };
 
   // 目前已放置貓咪數與衝突計算
@@ -512,6 +539,7 @@ export const App: React.FC = () => {
         onOpenUploadModal={() => setIsUploadModalOpen(true)}
         onOpenExportModal={() => setIsExportModalOpen(true)}
         onOpenHelpModal={() => setIsHelpModalOpen(true)}
+        onOpenAnnouncementModal={() => setIsAnnouncementOpen(true)}
         onTriggerSolve={() => {
           setMode('SOLVE');
           handleRunSolver();
@@ -967,6 +995,15 @@ export const App: React.FC = () => {
           setIsVictoryModalOpen(false);
           setMode('SOLVE');
           handleRunSolver();
+        }}
+      />
+
+      {/* 更新公告說明彈窗 */}
+      <AnnouncementModal
+        isOpen={isAnnouncementOpen}
+        onClose={() => setIsAnnouncementOpen(false)}
+        onOpenScreenshotUpload={() => {
+          setIsUploadModalOpen(true);
         }}
       />
     </div>

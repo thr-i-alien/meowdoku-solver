@@ -16,6 +16,7 @@ export interface Translations {
     btnScreenshot: string;
     btnScreenshotTitle: string;
     btnHelpTitle: string;
+    btnAnnouncementTitle: string;
     switchLangTitle: string;
   };
 
@@ -258,12 +259,35 @@ export interface Translations {
     showFineTune: string;
     step2Title: string;
     btnReanalyze: string;
+    importProgressLabel: string;
+    tabRegions: string;
+    tabProgress: string;
+    progressTip: string;
+    progressCatsCount: string;
+    progressCrossesCount: string;
     colorFixPrompt: string;
     defaultPaletteName: string;
     analyzingColors: string;
     emptyPreview: string;
     btnCancel: string;
     btnApply: string;
+  };
+
+  // 更新公告彈窗
+  announcementModal: {
+    badge: string;
+    title: string;
+    subtitle: string;
+    feature1Title: string;
+    feature1Desc: string;
+    feature2Title: string;
+    feature2Desc: string;
+    feature3Title: string;
+    feature3Desc: string;
+    feature4Title: string;
+    feature4Desc: string;
+    btnTryNow: string;
+    btnGotIt: string;
   };
 
   // Toast 與警告訊息

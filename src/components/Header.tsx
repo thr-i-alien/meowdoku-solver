@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, HelpCircle, Gamepad2, BrainCircuit, FileText, Languages, Paintbrush } from 'lucide-react';
+import { Camera, HelpCircle, Gamepad2, BrainCircuit, FileText, Languages, Paintbrush, AlertCircle } from 'lucide-react';
 import { CatIcon } from './icons';
 import type { AppMode } from '../types/game';
 import { useI18n } from '../i18n';
@@ -10,6 +10,7 @@ interface HeaderProps {
   onOpenUploadModal: () => void;
   onOpenExportModal: () => void;
   onOpenHelpModal: () => void;
+  onOpenAnnouncementModal: () => void;
   onTriggerSolve: () => void;
 }
 
@@ -19,6 +20,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenUploadModal,
   onOpenExportModal,
   onOpenHelpModal,
+  onOpenAnnouncementModal,
   onTriggerSolve,
 }) => {
   const { lang, toggleLang, t } = useI18n();
@@ -73,6 +75,15 @@ export const Header: React.FC<HeaderProps> = ({
 
         <button className="btn-secondary header-action-btn" onClick={onOpenUploadModal} title={t.brand.btnScreenshotTitle}>
           <Camera size={16} /> <span className="btn-text-responsive">{t.brand.btnScreenshot}</span>
+        </button>
+
+        <button
+          className="btn-icon header-action-btn"
+          onClick={onOpenAnnouncementModal}
+          title={t.brand.btnAnnouncementTitle}
+          aria-label={t.brand.btnAnnouncementTitle}
+        >
+          <AlertCircle size={18} />
         </button>
 
         <button className="btn-icon header-action-btn" onClick={onOpenHelpModal} title={t.brand.btnHelpTitle}>

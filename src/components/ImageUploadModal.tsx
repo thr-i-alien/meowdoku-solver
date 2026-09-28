@@ -22,14 +22,19 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { DEFAULT_COLORS } from '../logic/presets';
-import type { RegionColor } from '../types/game';
+import type { RegionColor, CellStatus } from '../types/game';
 import { useI18n } from '../i18n';
-
+import { CatIcon, CrossIcon } from './icons';
 
 interface ImageUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onApplyGrid: (grid: number[][], size: number, detectedColors?: RegionColor[]) => void;
+  onApplyGrid: (
+    grid: number[][],
+    size: number,
+    detectedColors?: RegionColor[],
+    cellStatuses?: CellStatus[][]
+  ) => void;
   initialSize: number;
 }
 
@@ -78,6 +83,9 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
 
   const [recognizedGrid, setRecognizedGrid] = useState<number[][] | null>(null);
   const [detectedColors, setDetectedColors] = useState<RegionColor[]>([]);
+  const [recognizedProgress, setRecognizedProgress] = useState<CellStatus[][] | null>(null);
+  const [importProgress, setImportProgress] = useState<boolean>(true);
+  const [activeTab, setActiveTab] = useState<'REGION' | 'PROGRESS'>('REGION');
   const [selectedCorrectionColorId, setSelectedCorrectionColorId] = useState<number>(0);
   const [isProcessing, setIsProcessing] = useState(false);
   const [detectionNotice, setDetectionNotice] = useState<{ text: string; dimension: number } | null>(null);
@@ -260,9 +268,10 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
     if (!imgRef.current) return;
     setIsProcessing(true);
     try {
-      const { grid, detectedColors: colors } = sampleGridFromImage(imgRef.current, cropBoxRef.current, gridSize);
+      const { grid, detectedColors: colors, cellStatuses } = sampleGridFromImage(imgRef.current, cropBoxRef.current, gridSize);
       setRecognizedGrid(grid);
       setDetectedColors(colors);
+      setRecognizedProgress(cellStatuses);
     } catch (err) {
       console.error('辨識失敗:', err);
     } finally {
@@ -281,13 +290,14 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
       cropBoxRef.current = result.cropBox;
       setGridSize(result.dimension);
 
-      const { grid, detectedColors: colors } = sampleGridFromImage(
+      const { grid, detectedColors: colors, cellStatuses } = sampleGridFromImage(
         targetImg,
         result.cropBox,
         result.dimension
       );
       setRecognizedGrid(grid);
       setDetectedColors(colors);
+      setRecognizedProgress(cellStatuses);
 
       setDetectionNotice({
         text: `${t.uploadModal.detectNoticePrefix}${result.dimension}×${result.dimension}${t.uploadModal.detectNoticeSuffix}`,
@@ -308,6 +318,7 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
     setDetectionNotice(null);
     setRecognizedGrid(null);
     setDetectedColors([]);
+    setRecognizedProgress(null);
 
     const url = URL.createObjectURL(blob);
     const img = new Image();
@@ -419,18 +430,44 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
     setCropBox(fitted);
   };
 
-  // 手動單格點擊校正顏色
-  const handleCorrectCell = (r: number, c: number) => {
-    if (!recognizedGrid) return;
-    const next = recognizedGrid.map((row, ri) =>
-      row.map((cell, ci) => (ri === r && ci === c ? selectedCorrectionColorId : cell))
-    );
-    setRecognizedGrid(next);
+  // 點擊格子處理（依當前分頁：校正色塊 或 循環切換進度標記）
+  const handleCellClick = (r: number, c: number) => {
+    if (activeTab === 'REGION') {
+      if (!recognizedGrid) return;
+      const next = recognizedGrid.map((row, ri) =>
+        row.map((cell, ci) => (ri === r && ci === c ? selectedCorrectionColorId : cell))
+      );
+      setRecognizedGrid(next);
+    } else {
+      // 循環切換：EMPTY -> CROSS -> CAT -> EMPTY
+      setRecognizedProgress((prev) => {
+        const base =
+          prev ||
+          Array.from({ length: gridSize }, () =>
+            Array.from({ length: gridSize }, () => 'EMPTY' as CellStatus)
+          );
+        return base.map((row, ri) =>
+          row.map((status, ci) => {
+            if (ri === r && ci === c) {
+              if (status === 'EMPTY') return 'CROSS';
+              if (status === 'CROSS') return 'CAT';
+              return 'EMPTY';
+            }
+            return status;
+          })
+        );
+      });
+    }
   };
 
   const handleApply = () => {
     if (recognizedGrid) {
-      onApplyGrid(recognizedGrid, gridSize, detectedColors);
+      onApplyGrid(
+        recognizedGrid,
+        gridSize,
+        detectedColors,
+        importProgress ? (recognizedProgress ?? undefined) : undefined
+      );
       onClose();
     }
   };
@@ -828,7 +865,7 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
 
                 {/* 即時辨識預覽結果 */}
                 <div className="preview-column">
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
                     <span style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--text-muted)' }}>
                       {interpolate(t.uploadModal.step2Title, { size: gridSize })}
                     </span>
@@ -844,8 +881,42 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                     </button>
                   </div>
 
-                  {/* 微調色票列 */}
-                  {detectedColors.length > 0 && (
+                  {/* 匯入進度勾選開關與分頁切換 */}
+                  <div className="preview-progress-toolbar">
+                    <label className="preview-checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={importProgress}
+                        onChange={(e) => setImportProgress(e.target.checked)}
+                        style={{ accentColor: 'var(--accent-orange)', cursor: 'pointer' }}
+                      />
+                      <span style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-main)', cursor: 'pointer' }}>
+                        {t.uploadModal.importProgressLabel}
+                      </span>
+                    </label>
+
+                    {importProgress && (
+                      <div className="preview-tabs">
+                        <button
+                          type="button"
+                          className={`preview-tab-btn ${activeTab === 'REGION' ? 'active' : ''}`}
+                          onClick={() => setActiveTab('REGION')}
+                        >
+                          <Palette size={12} /> {t.uploadModal.tabRegions}
+                        </button>
+                        <button
+                          type="button"
+                          className={`preview-tab-btn ${activeTab === 'PROGRESS' ? 'active' : ''}`}
+                          onClick={() => setActiveTab('PROGRESS')}
+                        >
+                          🐱 {t.uploadModal.tabProgress}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 分頁 A: 微調色票列 */}
+                  {(!importProgress || activeTab === 'REGION') && detectedColors.length > 0 && (
                     <div className="preview-correction-bar">
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.74rem', fontWeight: 800 }}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: 4, color: 'var(--text-main)' }}>
@@ -872,6 +943,32 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                     </div>
                   )}
 
+                  {/* 分頁 B: 進度標記微調與統計卡片 */}
+                  {importProgress && activeTab === 'PROGRESS' && (
+                    <div className="preview-progress-panel">
+                      <div className="preview-stats-row">
+                        <span className="preview-badge-cat">
+                          🐱 {interpolate(t.uploadModal.progressCatsCount, {
+                            count: recognizedProgress
+                              ? recognizedProgress.flat().filter((s) => s === 'CAT').length
+                              : 0,
+                            size: gridSize,
+                          })}
+                        </span>
+                        <span className="preview-badge-cross">
+                          ✕ {interpolate(t.uploadModal.progressCrossesCount, {
+                            count: recognizedProgress
+                              ? recognizedProgress.flat().filter((s) => s === 'CROSS').length
+                              : 0,
+                          })}
+                        </span>
+                      </div>
+                      <div className="preview-hint-text">
+                        💡 {t.uploadModal.progressTip}
+                      </div>
+                    </div>
+                  )}
+
                   {recognizedGrid ? (
                     <div
                       className="preview-grid-board"
@@ -886,6 +983,11 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                           const color =
                             detectedColors[colorId] || DEFAULT_COLORS[colorId % DEFAULT_COLORS.length];
                           const cName = getDisplayColorName(color, colorId);
+                          const cellStatus =
+                            importProgress && recognizedProgress?.[r]?.[c]
+                              ? recognizedProgress[r][c]
+                              : 'EMPTY';
+
                           return (
                             <div
                               key={`${r}-${c}`}
@@ -894,10 +996,29 @@ export const ImageUploadModal: React.FC<ImageUploadModalProps> = ({
                                 backgroundColor: color.bgHex,
                                 borderRadius: 4,
                                 border: `1px solid ${color.borderHex}`,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                position: 'relative',
                               }}
-                              onClick={() => handleCorrectCell(r, c)}
-                              title={`(${r + 1}, ${c + 1}) - ${cName}`}
-                            />
+                              onClick={() => handleCellClick(r, c)}
+                              title={
+                                activeTab === 'PROGRESS'
+                                  ? `(${r + 1}, ${c + 1}) - [${cellStatus}]`
+                                  : `(${r + 1}, ${c + 1}) - ${cName}`
+                              }
+                            >
+                              {cellStatus === 'CAT' && (
+                                <span className="preview-cell-cat" aria-label="貓咪">
+                                  <CatIcon size="80%" />
+                                </span>
+                              )}
+                              {cellStatus === 'CROSS' && (
+                                <span className="preview-cell-cross" aria-label="✕">
+                                  <CrossIcon color="#ffffff" strokeWidth={3.8} />
+                                </span>
+                              )}
+                            </div>
                           );
                         })
                       )}

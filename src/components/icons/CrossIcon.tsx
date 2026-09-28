@@ -12,8 +12,8 @@ export const CrossIcon: React.FC<CrossIconProps> = ({
   size = '100%',
   className = '',
   style = {},
-  color = 'currentColor',
-  strokeWidth = 4,
+  color = '#ffffff',
+  strokeWidth = 3.5,
 }) => {
   return (
     <svg
