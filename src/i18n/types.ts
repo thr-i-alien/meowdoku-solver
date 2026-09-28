@@ -52,6 +52,32 @@ export interface Translations {
     guideRuleTitle: string;
     guideRuleDesc: string;
     btnStartPlay: string;
+    btnStartSolve: string;
+    toolBrush: string;
+    toolBucket: string;
+    gridSizeLabel: string;
+    statusValid: string;
+    statusInvalid: string;
+    statusDisconnectedWarning: string;
+    btnRandomBoard: string;
+    btnClearAll: string;
+    btnLoadPreset: string;
+    btnCheckSolvable: string;
+    solvableUnique: string;
+    solvableMultiple: string;
+    solvableNone: string;
+    solvableChecking: string;
+    cellCountUnit: string;
+    colorCountTag: string;
+    undo: string;
+    redo: string;
+    regionValidBadge: string;
+    regionInvalidBadge: string;
+    feasibilityPendingBadge: string;
+    feasibilityCheckingBadge: string;
+    feasibilityUniqueBadge: string;
+    feasibilityMultiBadge: string;
+    feasibilityNoneBadge: string;
   };
 
   // 顏色名稱

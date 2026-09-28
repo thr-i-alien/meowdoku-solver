@@ -1,5 +1,5 @@
 import React from 'react';
-import { Camera, HelpCircle, Gamepad2, BrainCircuit, FileText, Languages } from 'lucide-react';
+import { Camera, HelpCircle, Gamepad2, BrainCircuit, FileText, Languages, Paintbrush } from 'lucide-react';
 import { CatIcon } from './icons';
 import type { AppMode } from '../types/game';
 import { useI18n } from '../i18n';
@@ -55,6 +55,14 @@ export const Header: React.FC<HeaderProps> = ({
         >
           <Gamepad2 size={17} />
           <span>{t.brand.modePlay}</span>
+        </button>
+        <button
+          className={`mode-tab-btn ${currentMode === 'EDIT' ? 'active' : ''}`}
+          onClick={() => onChangeMode('EDIT')}
+          title={t.brand.modeEditTitle}
+        >
+          <Paintbrush size={17} />
+          <span>{t.brand.modeEdit}</span>
         </button>
       </div>
 

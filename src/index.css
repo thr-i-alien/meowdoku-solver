@@ -213,7 +213,7 @@ button:active {
 
 @media (max-width: 980px) {
   .workspace-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) !important;
   }
 }
 
@@ -227,6 +227,9 @@ button:active {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .board-card-header {
@@ -547,26 +550,120 @@ button:active {
   to { opacity: 1; transform: scale(1); }
 }
 
-/* 調色盤工具列 */
+/* 調色盤工具列 (現代化磨砂玻璃質感) */
 .palette-toolbar {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  background: var(--bg-panel);
+  background: var(--bg-card);
   padding: 14px 18px;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-soft);
 }
 
 .palette-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   font-weight: 700;
   color: var(--text-muted);
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
+.palette-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-main);
+  font-weight: 800;
+}
+
+.palette-icon {
+  color: var(--accent-orange);
+}
+
+.palette-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* 筆刷與油漆桶模式切換鈕組 */
+.edit-tool-toggle-group {
+  display: flex;
+  background: var(--bg-body);
+  border-radius: var(--radius-full);
+  padding: 3px;
+  border: 1px solid var(--border-light);
+}
+
+.tool-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.tool-toggle-btn:hover {
+  color: var(--text-main);
+}
+
+.tool-toggle-btn.active {
+  background: var(--accent-orange);
+  color: #ffffff;
+  box-shadow: 0 2px 6px rgba(229, 152, 25, 0.35);
+}
+
+/* 復原 / 重做按鈕群 */
+.palette-history-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.history-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border-light);
+  background: var(--bg-card);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.history-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.history-btn:not(:disabled):hover {
+  background: var(--bg-body);
+  border-color: var(--accent-orange);
+  color: var(--accent-orange);
+}
+
+.palette-reset-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+}
+
+/* 顏色選擇膠囊列表 */
 .color-pills-row {
   display: flex;
   flex-wrap: wrap;
@@ -574,30 +671,73 @@ button:active {
 }
 
 .color-pill {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 5px 10px;
+  padding: 6px 12px;
   border-radius: var(--radius-full);
-  background: #ffffff;
-  border: 2px solid transparent;
+  background: var(--bg-card);
+  border: 2px solid var(--border-light);
   cursor: pointer;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 700;
+  color: var(--text-main);
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
+.color-pill:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  border-color: var(--text-muted);
+}
+
 .color-pill.active {
-  border-color: var(--text-main);
   transform: translateY(-2px);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
+  border-width: 2.5px;
+  font-weight: 800;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.14);
+}
+
+.color-pill.pill-empty {
+  opacity: 0.72;
+  border-style: dashed;
 }
 
 .color-dot {
-  width: 14px;
-  height: 14px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border: 1.5px solid rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.color-pill.active .color-dot {
+  transform: scale(1.15);
+}
+
+.color-pill-name {
+  white-space: nowrap;
+}
+
+.color-pill-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--bg-body);
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: var(--text-muted);
+}
+
+.color-pill-count.count-zero {
+  background: #fee2e2;
+  color: #ef4444;
 }
 
 /* 推導邏輯面板 (右側) */
@@ -1794,6 +1934,65 @@ button:active {
   border: 1px solid var(--border-light);
 }
 
+.badge-warning {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #fffbeb;
+  color: #b45309;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 800;
+  border: 1px solid #fde68a;
+}
+
+.badge-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 800;
+  border: 1px solid #bfdbfe;
+}
+
+.badge-accent {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(229, 152, 25, 0.1);
+  color: var(--accent-orange);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.78rem;
+  font-weight: 800;
+  border: 1px solid rgba(229, 152, 25, 0.3);
+}
+
+.header-badges-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.spin-icon {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* 貓咪進度卡片 */
 .progress-card {
   background: var(--bg-card);
@@ -2442,17 +2641,26 @@ button:active {
     border-radius: var(--radius-sm);
   }
 
-  /* 工作區網格轉換為單欄流式佈局 */
+  /* 工作區網格轉換為單欄流式佈局，使用 minmax(0, 1fr) 防止內容物撐寬溢出 */
   .workspace-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) !important;
     gap: 14px;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
   }
 
-  /* 棋盤卡片：極致利用手機螢幕寬度，提升觸控命中率 */
+  /* 棋盤卡片：嚴格鎖定寬度不超過螢幕 */
   .board-card {
     padding: 10px 6px;
     border-radius: var(--radius-md);
     gap: 10px;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow: hidden;
   }
 
   .board-card-header {
@@ -2473,10 +2681,17 @@ button:active {
     padding: 4px 2px;
     border-radius: var(--radius-md);
     border-width: 1.5px;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
   }
 
   .board-coordinate-container {
-    max-width: 100%;
+    max-width: 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
   }
 
   /* 座標系統尺寸收縮，留出 95%+ 寬度給棋盤格點 */
@@ -2497,6 +2712,9 @@ button:active {
 
   .coord-main-row {
     align-items: stretch;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
   }
 
   .coord-row-headers {
@@ -2519,12 +2737,59 @@ button:active {
     width: 18px;
   }
 
-  /* 棋盤主網格 */
+  /* 棋盤主網格：嚴格鎖定在容器寬度內 */
   .meow-grid {
     padding: 6px !important;
     gap: 3px !important;
     border-radius: var(--radius-md);
     touch-action: none; /* 防止滑動劃記時引發視窗原生捲動 */
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    aspect-ratio: 1 / 1 !important;
+    box-sizing: border-box !important;
+  }
+
+  /* 手機介面調色盤自適應 */
+  .board-palette-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .palette-toolbar {
+    padding: 8px !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .palette-header {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 6px !important;
+  }
+
+  .palette-actions {
+    width: 100% !important;
+    justify-content: space-between !important;
+  }
+
+  .color-pills-row {
+    gap: 4px !important;
+  }
+
+  .color-pill {
+    padding: 4px 7px !important;
+    font-size: 0.72rem !important;
+    gap: 4px !important;
+  }
+
+  .color-pill-name {
+    font-size: 0.7rem !important;
   }
 
   .grid-cell {
@@ -3186,6 +3451,14 @@ button:active {
     border-width: 1px !important;
   }
 
+  .tool-toggle-btn .tool-text {
+    display: none !important;
+  }
+
+  .tool-toggle-btn {
+    padding: 5px 9px !important;
+  }
+
   .mobile-bar-btn {
     min-height: 44px;
   }
@@ -3221,4 +3494,334 @@ button:active {
   transform: translateY(-1px) scale(1.04);
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.22);
 }
+
+/* ==========================================================================
+   地圖手動編輯模式專屬樣式 (Map Editor Mode)
+   ========================================================================== */
+
+/* 棋盤格處於編輯狀態時的游標與視覺回饋 */
+.cell-editable {
+  cursor: crosshair !important;
+  transition: transform 0.12s ease, filter 0.12s ease, box-shadow 0.12s ease;
+}
+
+.cell-editable:hover {
+  transform: scale(1.05);
+  z-index: 10;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  filter: brightness(1.08);
+}
+
+.cell-editable:active {
+  transform: scale(0.96);
+}
+
+/* 地圖編輯控制面板 (右側) */
+.edit-control-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.edit-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  padding: 18px 20px;
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.edit-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.edit-card-title-row {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.edit-card-title-row .card-header-icon {
+  color: var(--accent-orange);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.edit-card-title-row .card-title {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+
+/* 維度切換按鈕組 (4 ~ 12，共 9 個單一數字按鈕) */
+.dimension-buttons-row {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 5px;
+}
+
+.dim-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+  border-radius: var(--radius-sm);
+  background: var(--bg-body);
+  border: 1px solid var(--border-light);
+  color: var(--text-main);
+  font-weight: 800;
+  font-size: 0.92rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.dim-btn:hover {
+  border-color: var(--accent-orange);
+  background: rgba(229, 152, 25, 0.08);
+  transform: translateY(-1px);
+}
+
+.dim-btn.active {
+  background: var(--accent-orange);
+  color: #ffffff;
+  border-color: var(--accent-orange);
+  box-shadow: 0 2px 8px rgba(229, 152, 25, 0.35);
+}
+
+/* 地圖完整度分析儀表板 */
+.integrity-status-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.integrity-stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.88rem;
+  padding: 8px 12px;
+  background: var(--bg-body);
+  border-radius: var(--radius-sm);
+}
+
+.stat-label {
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.stat-value {
+  font-weight: 700;
+}
+
+.stat-value.text-success {
+  color: #059669;
+}
+
+.stat-value.text-warning {
+  color: #d97706;
+}
+
+.integrity-warning-box {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 10px 12px;
+  background: #fef3c7;
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-sm);
+  color: #92400e;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.warning-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: #d97706;
+}
+
+/* 可解性驗證診斷 */
+.solvability-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.check-solvable-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: var(--radius-md);
+}
+
+.solvability-result-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.4;
+  animation: fadeIn 0.25s ease;
+}
+
+.solvability-result-box.result-unique {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.solvability-result-box.result-multi {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  color: #92400e;
+}
+
+.solvability-result-box.result-none {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+/* 快捷地圖工具箱 */
+.edit-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.edit-tool-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px 6px;
+  background: var(--bg-body);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  cursor: pointer;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.edit-tool-action-btn:hover {
+  background: var(--bg-card);
+  border-color: var(--accent-orange);
+  color: var(--accent-orange);
+  transform: translateY(-2px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+}
+
+.edit-tool-action-btn.action-danger:hover {
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+/* 導引指南卡片 */
+.guide-card {
+  background: rgba(229, 152, 25, 0.06);
+  border-color: rgba(229, 152, 25, 0.2);
+}
+
+.guide-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--text-main);
+}
+
+.guide-text {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.guide-rule {
+  font-size: 0.78rem;
+  color: var(--text-main);
+  line-height: 1.5;
+  margin: 0;
+  padding: 6px 10px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--accent-orange);
+}
+
+/* 完成與跳轉按鈕組 */
+.edit-cta-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.cta-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 14px 20px;
+  font-size: 0.95rem;
+  font-weight: 800;
+  border-radius: var(--radius-md);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.cta-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+}
+
+.start-play-btn {
+  background: linear-gradient(135deg, #e59819 0%, #d87d15 100%);
+  color: #ffffff;
+  border: none;
+}
+
+.start-solve-btn {
+  background: var(--bg-card);
+  border: 1.5px solid var(--accent-orange);
+  color: var(--accent-orange);
+}
+
+.start-solve-btn:hover {
+  background: rgba(229, 152, 25, 0.08);
+}
+
+/* 手機版編輯工具列底欄項目 */
+.mobile-edit-bar {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.mobile-edit-bar .mobile-bar-btn.active-tool {
+  background: var(--accent-orange);
+  color: #ffffff;
+  border-color: var(--accent-orange);
+}
+
 

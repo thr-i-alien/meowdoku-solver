@@ -55,9 +55,11 @@ export interface SolveResult {
   solutionCount?: number;
 }
 
-export type AppMode = 'PLAY' | 'SOLVE';
+export type AppMode = 'PLAY' | 'SOLVE' | 'EDIT';
 
 export type PlayTool = 'CROSS' | 'CAT';
+
+export type EditTool = 'BRUSH' | 'BUCKET';
 
 export interface ConflictDetail {
   r: number;

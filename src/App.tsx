@@ -2,12 +2,22 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { DEFAULT_INITIAL_GRID, DEFAULT_COLORS } from './logic/presets';
 import { solveMeowdoku } from './logic/solver';
 import { checkConflicts, checkVictory, autoFillCrosses, getSmartHint } from './logic/validator';
-import type { SolveResult, CellStatus, RegionColor, AppMode, PlayTool, HintInfo, CellCoord } from './types/game';
+import {
+  floodFill,
+  checkMapIntegrity,
+  generateRandomValidBoard,
+  createUniformBoard,
+  resizeBoard,
+  ensureColorsForSize,
+} from './logic/mapEditor';
+import type { SolveResult, CellStatus, RegionColor, AppMode, PlayTool, EditTool, HintInfo, CellCoord } from './types/game';
 import { Header } from './components/Header';
 import { Board } from './components/Board';
 import { StepExplanation } from './components/StepExplanation';
 import { TimelinePlayer } from './components/TimelinePlayer';
 import { PlayControlPanel } from './components/PlayControlPanel';
+import { EditControlPanel } from './components/EditControlPanel';
+import { ColorPalette } from './components/ColorPalette';
 import { HintCard } from './components/HintCard';
 import { VictoryModal } from './components/VictoryModal';
 import { ImageUploadModal } from './components/ImageUploadModal';
@@ -30,6 +40,9 @@ import {
   Zap,
   Gamepad2,
   AlertTriangle,
+  Paintbrush,
+  PaintBucket,
+  Dices,
 } from 'lucide-react';
 import { CatIcon } from './components/icons';
 
@@ -43,13 +56,24 @@ export const App: React.FC = () => {
     return `${String(mins).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
   };
 
-  // 核心模式管理：'PLAY' (手動解題) | 'SOLVE' (AI 逐步推導)
+  // 核心模式管理：'PLAY' (手動解題) | 'SOLVE' (AI 逐步推導) | 'EDIT' (地圖編輯)
   const [mode, setMode] = useState<AppMode>('SOLVE');
 
   // 盤面與顏色配置
   const [gridSize, setGridSize] = useState<number>(10);
   const [regionGrid, setRegionGrid] = useState<number[][]>(DEFAULT_INITIAL_GRID);
   const [activeColors, setActiveColors] = useState<RegionColor[]>(DEFAULT_COLORS);
+
+  // 地圖編輯專屬狀態：選取顏色、筆刷工具、歷史復原/重做
+  const [selectedColorId, setSelectedColorId] = useState<number>(0);
+  const [editTool, setEditTool] = useState<EditTool>('BRUSH');
+  const [history, setHistory] = useState<number[][][]>([DEFAULT_INITIAL_GRID]);
+  const [historyIndex, setHistoryIndex] = useState<number>(0);
+
+  // 地圖合法性與連通性分析
+  const mapIntegrity = useMemo(() => {
+    return checkMapIntegrity(regionGrid, gridSize);
+  }, [regionGrid, gridSize]);
 
   // 即時計算當前題目的正解盤面 (供手動挑戰解題時即時比對與檢查衝突)
   const currentSolution = useMemo(() => {
@@ -316,6 +340,119 @@ export const App: React.FC = () => {
     setHintInfo(null);
   };
 
+  // 地圖編輯：歷史步進推入
+  const pushGridHistory = (newGrid: number[][]) => {
+    setHistory((prev) => {
+      const sliced = prev.slice(0, historyIndex + 1);
+      return [...sliced, newGrid].slice(-30);
+    });
+    setHistoryIndex((prev) => Math.min(prev + 1, 29));
+    setRegionGrid(newGrid);
+  };
+
+  // 地圖編輯：復原
+  const handleUndoGrid = () => {
+    if (historyIndex > 0) {
+      const prevIdx = historyIndex - 1;
+      setHistoryIndex(prevIdx);
+      setRegionGrid(history[prevIdx]);
+    }
+  };
+
+  // 地圖編輯：重做
+  const handleRedoGrid = () => {
+    if (historyIndex < history.length - 1) {
+      const nextIdx = historyIndex + 1;
+      setHistoryIndex(nextIdx);
+      setRegionGrid(history[nextIdx]);
+    }
+  };
+
+  // 地圖編輯：單格筆刷塗色
+  const handleCellPaint = (r: number, c: number, colorId: number) => {
+    if (regionGrid[r]?.[c] === colorId) return;
+    const nextGrid = regionGrid.map((row, ri) =>
+      row.map((val, ci) => (ri === r && ci === c ? colorId : val))
+    );
+    pushGridHistory(nextGrid);
+  };
+
+  // 地圖編輯：油漆桶填色
+  const handleBucketFill = (r: number, c: number, colorId: number) => {
+    if (regionGrid[r]?.[c] === colorId) return;
+    const nextGrid = floodFill(regionGrid, r, c, colorId);
+    pushGridHistory(nextGrid);
+  };
+
+  // 地圖編輯：動態調整盤面維度
+  const handleChangeGridSize = (newSize: number) => {
+    const resized = resizeBoard(regionGrid, newSize);
+    const newColors = ensureColorsForSize(activeColors, newSize);
+    setGridSize(newSize);
+    setActiveColors(newColors);
+    if (selectedColorId >= newSize) {
+      setSelectedColorId(0);
+    }
+    pushGridHistory(resized);
+    setPlayerGrid(
+      Array.from({ length: newSize }, () =>
+        Array.from({ length: newSize }, () => 'EMPTY' as CellStatus)
+      )
+    );
+    setHintInfo(null);
+  };
+
+  // 地圖編輯：隨機生成連通合法地圖
+  const handleGenerateRandomBoard = () => {
+    const randomGrid = generateRandomValidBoard(gridSize);
+    pushGridHistory(randomGrid);
+    triggerNotice(t.editMode.btnRandomBoard + ' ✓', 2000);
+  };
+
+  // 地圖編輯：載入經典預設題目
+  const handleLoadPresetBoard = () => {
+    if (gridSize === 10) {
+      pushGridHistory(DEFAULT_INITIAL_GRID);
+    } else {
+      setGridSize(10);
+      setActiveColors(DEFAULT_COLORS.slice(0, 10));
+      pushGridHistory(DEFAULT_INITIAL_GRID);
+    }
+    triggerNotice(t.editMode.btnLoadPreset + ' ✓', 2000);
+  };
+
+  // 地圖編輯：清空盤面為單一顏色
+  const handleClearBoardToSingleColor = () => {
+    const uniformGrid = createUniformBoard(gridSize, selectedColorId);
+    pushGridHistory(uniformGrid);
+    triggerNotice(t.editMode.btnClearAll + ' ✓', 2000);
+  };
+
+  // 地圖編輯：開始手動挑戰
+  const handleStartPlaying = () => {
+    if (!mapIntegrity.isValidCount) {
+      triggerNotice(interpolate(t.board.invalidRegion, { n: gridSize }), 3500);
+    }
+    setPlayerGrid(
+      Array.from({ length: gridSize }, () =>
+        Array.from({ length: gridSize }, () => 'EMPTY' as CellStatus)
+      )
+    );
+    setElapsedSeconds(0);
+    setIsTimerRunning(true);
+    setHintInfo(null);
+    setMode('PLAY');
+  };
+
+  // 地圖編輯：AI 邏輯推導
+  const handleStartSolving = () => {
+    if (!mapIntegrity.isValidCount) {
+      triggerNotice(interpolate(t.board.invalidRegion, { n: gridSize }), 3500);
+    }
+    setMode('SOLVE');
+    handleRunSolver(regionGrid, activeColors);
+  };
+
 
 
   // 從截圖辨識套用網格
@@ -418,6 +555,10 @@ export const App: React.FC = () => {
                   <>
                     <Gamepad2 size={18} color="var(--accent-orange)" /> {t.board.titlePlay}
                   </>
+                ) : mode === 'EDIT' ? (
+                  <>
+                    <Paintbrush size={18} color="var(--accent-orange)" /> {t.board.titleEdit}
+                  </>
                 ) : (
                   <>
                     <Sparkles size={18} color="var(--accent-orange)" /> {t.board.titleSolve}
@@ -473,15 +614,39 @@ export const App: React.FC = () => {
             colors={activeColors}
             currentStep={currentStep}
             mode={mode}
+            selectedColorId={selectedColorId}
+            editTool={editTool}
             activePlayTool={playTool}
             conflictCells={showConflicts ? conflicts.cells : []}
             conflictDetails={showConflicts ? conflicts.details : {}}
             hintCoord={hintInfo?.coord}
             hintInfo={hintInfo}
+            onCellPaint={handleCellPaint}
+            onBucketFill={handleBucketFill}
             onPlayerToggleCross={handlePlayerToggleCross}
             onPlayerToggleCat={handlePlayerToggleCat}
             onPlayerBatchCross={handlePlayerBatchCross}
           />
+
+          {/* 地圖編輯模式：緊接在棋盤下方的區域調色盤與塗色工具 */}
+          {mode === 'EDIT' && (
+            <div className="board-palette-wrapper" style={{ marginTop: 14 }}>
+              <ColorPalette
+                gridSize={gridSize}
+                selectedColorId={selectedColorId}
+                colors={activeColors}
+                editTool={editTool}
+                colorCounts={mapIntegrity.colorCounts}
+                onSelectColor={setSelectedColorId}
+                onChangeEditTool={setEditTool}
+                onResetBoard={handleClearBoardToSingleColor}
+                onUndo={handleUndoGrid}
+                onRedo={handleRedoGrid}
+                canUndo={historyIndex > 0}
+                canRedo={historyIndex < history.length - 1}
+              />
+            </div>
+          )}
 
           {/* 手動解題模式：手機與窄螢幕緊鄰棋盤正下方的提示說明卡片（免滑動即可見） */}
           {mode === 'PLAY' && hintInfo && (
@@ -498,7 +663,21 @@ export const App: React.FC = () => {
 
         {/* 右側：依模式切換面板 */}
         <div className="solver-panel">
-          {mode === 'PLAY' ? (
+          {mode === 'EDIT' ? (
+            /* 地圖編輯控制面板 */
+            <EditControlPanel
+              gridSize={gridSize}
+              regionGrid={regionGrid}
+              colors={activeColors}
+              integrity={mapIntegrity}
+              onChangeGridSize={handleChangeGridSize}
+              onGenerateRandomBoard={handleGenerateRandomBoard}
+              onLoadPresetBoard={handleLoadPresetBoard}
+              onClearBoardToSingleColor={handleClearBoardToSingleColor}
+              onStartPlaying={handleStartPlaying}
+              onStartSolving={handleStartSolving}
+            />
+          ) : mode === 'PLAY' ? (
             /* 手動模式面板 */
             <PlayControlPanel
               gridSize={gridSize}
@@ -576,6 +755,46 @@ export const App: React.FC = () => {
 
       {/* 手機版常駐浮動底欄 (Mobile Sticky Bottom Bar) */}
       <div className="mobile-bottom-bar" role="toolbar" aria-label="Mobile Navigation Toolbar">
+        {mode === 'EDIT' && (
+          <div className="mobile-bar-actions mobile-edit-bar">
+            <button
+              className={`mobile-bar-btn ${editTool === 'BRUSH' ? 'active-tool' : ''}`}
+              onClick={() => setEditTool('BRUSH')}
+              title={t.editMode.toolBrush}
+            >
+              <Paintbrush size={16} />
+              <span className="btn-text">{t.editMode.toolBrush}</span>
+            </button>
+
+            <button
+              className={`mobile-bar-btn ${editTool === 'BUCKET' ? 'active-tool' : ''}`}
+              onClick={() => setEditTool('BUCKET')}
+              title={t.editMode.toolBucket}
+            >
+              <PaintBucket size={16} />
+              <span className="btn-text">{t.editMode.toolBucket}</span>
+            </button>
+
+            <button
+              className="mobile-bar-btn"
+              onClick={handleGenerateRandomBoard}
+              title={t.editMode.btnRandomBoard}
+            >
+              <Dices size={16} />
+              <span className="btn-text">{lang === 'en' ? 'Random' : '隨機'}</span>
+            </button>
+
+            <button
+              className="mobile-bar-btn hint-btn"
+              onClick={handleStartPlaying}
+              title={t.editMode.btnStartPlay}
+            >
+              <Gamepad2 size={16} />
+              <span className="btn-text">{lang === 'en' ? 'Play' : '去挑戰'}</span>
+            </button>
+          </div>
+        )}
+
         {mode === 'PLAY' && (
           <div className="mobile-bar-actions">
             <button

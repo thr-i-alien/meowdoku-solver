@@ -1,10 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import type { CellCoord, CellStatus, DeductionStep, RegionColor, AppMode, PlayTool, ConflictDetail, HintInfo } from '../types/game';
+import type { CellCoord, CellStatus, DeductionStep, RegionColor, AppMode, PlayTool, EditTool, ConflictDetail, HintInfo } from '../types/game';
 import { DEFAULT_COLORS } from '../logic/presets';
 import { AlertTriangle, Sparkles } from 'lucide-react';
 import { CatIcon, PawIcon, CrossIcon } from './icons';
 import { useI18n } from '../i18n';
-
 
 interface BoardProps {
   gridSize: number;
@@ -14,12 +13,14 @@ interface BoardProps {
   currentStep?: DeductionStep;
   mode: AppMode;
   selectedColorId?: number;
+  editTool?: EditTool;
   activePlayTool?: PlayTool;
   conflictCells?: CellCoord[];
   conflictDetails?: Record<string, ConflictDetail>;
   hintCoord?: CellCoord | null;
   hintInfo?: HintInfo | null;
   onCellPaint?: (r: number, c: number, colorId: number) => void;
+  onBucketFill?: (r: number, c: number, colorId: number) => void;
   onPlayerToggleCross?: (r: number, c: number) => void;
   onPlayerToggleCat?: (r: number, c: number) => void;
   onPlayerBatchCross?: (cells: CellCoord[], targetStatus: CellStatus) => void;
@@ -32,11 +33,15 @@ export const Board: React.FC<BoardProps> = ({
   colors = DEFAULT_COLORS,
   currentStep,
   mode,
+  selectedColorId = 0,
+  editTool = 'BRUSH',
   activePlayTool = 'CROSS',
   conflictCells = [],
   conflictDetails = {},
   hintCoord = null,
   hintInfo = null,
+  onCellPaint,
+  onBucketFill,
   onPlayerToggleCross,
   onPlayerToggleCat,
   onPlayerBatchCross,
@@ -121,6 +126,17 @@ export const Board: React.FC<BoardProps> = ({
           if (targetStatus && currentStatus !== targetStatus && onPlayerBatchCross) {
             onPlayerBatchCross([{ r, c }], targetStatus);
           }
+        }
+      }
+    } else if (mode === 'EDIT') {
+      if (editTool === 'BUCKET') {
+        if (isInitial && onBucketFill) {
+          onBucketFill(r, c, selectedColorId);
+        }
+      } else {
+        // BRUSH 筆刷塗色
+        if (onCellPaint) {
+          onCellPaint(r, c, selectedColorId);
         }
       }
     }
@@ -236,7 +252,7 @@ export const Board: React.FC<BoardProps> = ({
         lastTapRef.current = null;
       }
 
-      if (mode === 'PLAY') {
+      if (mode === 'PLAY' || mode === 'EDIT') {
         setIsMouseDown(true);
         touchedCellsRef.current = new Set([`${state.r},${state.c}`]);
         triggerCellAction(state.r, state.c, true);
@@ -257,7 +273,7 @@ export const Board: React.FC<BoardProps> = ({
         }
       }
 
-      if (e.cancelable && activePlayTool === 'CROSS') {
+      if (e.cancelable && (activePlayTool === 'CROSS' || mode === 'EDIT')) {
         e.preventDefault();
       }
     }
@@ -282,6 +298,11 @@ export const Board: React.FC<BoardProps> = ({
 
     const { r, c } = state;
     handleMouseUp();
+
+    if (mode === 'EDIT') {
+      triggerCellAction(r, c, true);
+      return;
+    }
 
     if (mode === 'PLAY') {
       const now = Date.now();
@@ -483,7 +504,7 @@ export const Board: React.FC<BoardProps> = ({
                       isHintCat ? 'cell-hint cell-hint-cat' : ''
                     } ${isHintCross ? 'cell-hint cell-hint-cross' : ''} ${
                       isSource ? 'cell-hint-source' : ''
-                    } ${mode === 'PLAY' ? 'cell-interactive' : ''}`}
+                    } ${mode === 'PLAY' ? 'cell-interactive' : ''} ${mode === 'EDIT' ? 'cell-interactive cell-editable' : ''}`}
                     style={{
                       backgroundColor: colorDef.bgHex,
                       border: `${gridSize >= 15 ? 1.5 : 2}px solid ${colorDef.borderHex}`,
@@ -497,12 +518,12 @@ export const Board: React.FC<BoardProps> = ({
                     onContextMenu={(e) => handleContextMenu(e, r, c)}
                     title={cellTitle}
                   >
-                    {status === 'CAT' && (
+                    {mode !== 'EDIT' && status === 'CAT' && (
                       <span className="cell-cat">
                         <CatIcon size="80%" />
                       </span>
                     )}
-                    {status === 'CROSS' && (
+                    {mode !== 'EDIT' && status === 'CROSS' && (
                       <span className={`cell-cross ${isWrongCross ? 'cross-wrong' : ''}`}>
                         <CrossIcon />
                       </span>
