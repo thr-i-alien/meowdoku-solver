@@ -315,4 +315,9 @@ export const en: Translations = {
       `${catCount} cat(s) placed correctly and match the solution! Keep going to find the remaining ${remaining} cat(s).`,
     solverFailed: 'Solver failed, please verify the board configuration',
   },
+
+  footer: {
+    githubRepo: 'GitHub Repository',
+    madeWithLove: 'Crafted with care for Meowdoku fans',
+  },
 };

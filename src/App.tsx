@@ -24,6 +24,7 @@ import { ImageUploadModal } from './components/ImageUploadModal';
 import { HelpModal } from './components/HelpModal';
 import { ExportTextModal } from './components/ExportTextModal';
 import { AnnouncementModal, ANNOUNCEMENT_STORAGE_KEY } from './components/AnnouncementModal';
+import { Footer } from './components/Footer';
 import { useI18n } from './i18n';
 import {
   AlertCircle,
@@ -780,6 +781,9 @@ export const App: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* 頁面頁腳 Footer */}
+      <Footer />
 
       {/* 手機版常駐浮動底欄 (Mobile Sticky Bottom Bar) */}
       <div className="mobile-bottom-bar" role="toolbar" aria-label="Mobile Navigation Toolbar">

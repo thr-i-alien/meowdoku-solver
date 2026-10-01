@@ -301,4 +301,10 @@ export interface Translations {
     validCatsPlaced: (catCount: number, remaining: number) => string;
     solverFailed: string;
   };
+
+  // 頁腳 Footer
+  footer: {
+    githubRepo: string;
+    madeWithLove: string;
+  };
 }

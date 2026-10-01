@@ -315,4 +315,9 @@ export const zhTW: Translations = {
       `目前放置的 ${catCount} 隻貓咪完全合規且吻合正解！請繼續找出剩下的 ${remaining} 隻貓咪。`,
     solverFailed: '推導失敗，請檢查盤面',
   },
+
+  footer: {
+    githubRepo: 'GitHub 專案原始碼',
+    madeWithLove: '為 貓咪數獨 愛好者精心打造',
+  },
 };

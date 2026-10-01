@@ -4181,4 +4181,124 @@ button:active {
   transform: translateY(0);
 }
 
+/* 頁面頁腳 Footer 樣式 */
+.app-footer {
+  margin-top: 12px;
+  padding: 16px 24px;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-soft);
+}
+
+.footer-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footer-brand-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.footer-brand-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  color: var(--text-main);
+  letter-spacing: -0.2px;
+}
+
+.footer-divider {
+  color: var(--border-medium);
+  font-size: 0.75rem;
+}
+
+.footer-note {
+  color: var(--text-muted);
+}
+
+.footer-links {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-github-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  background: var(--bg-panel);
+  border: 1px solid var(--border-medium);
+  color: var(--text-main);
+  text-decoration: none;
+  font-size: 0.86rem;
+  font-weight: 700;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 1px 3px rgba(43, 37, 32, 0.05);
+}
+
+.footer-github-btn:hover {
+  background: #ffffff;
+  color: var(--accent-orange);
+  border-color: var(--accent-border);
+  transform: translateY(-1.5px);
+  box-shadow: 0 4px 12px rgba(228, 117, 53, 0.18);
+}
+
+.footer-github-btn:active {
+  transform: translateY(0);
+}
+
+.footer-github-text {
+  letter-spacing: -0.2px;
+}
+
+.footer-ext-icon {
+  opacity: 0.55;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.footer-github-btn:hover .footer-ext-icon {
+  opacity: 1;
+  transform: translate(1px, -1px);
+}
+
+@media (max-width: 680px) {
+  .app-footer {
+    padding: 14px 16px;
+    margin-top: 8px;
+    border-radius: var(--radius-md);
+  }
+
+  .footer-content {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .footer-brand-meta {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    font-size: 0.82rem;
+  }
+
+  .footer-github-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 
